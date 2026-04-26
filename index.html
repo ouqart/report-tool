@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>REPORT STACKER</title>
+    <title>通報リンク生成器</title>
     <style>
         :root { --bg: #ffffff; --text: #1a1a1a; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        body { 
+            background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; 
+            margin: 0; display: flex; flex-direction: column; align-items: center; 
+            /* 【修正】連打時のズーム防止 */
+            touch-action: manipulation; 
+        }
         .container { width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; }
 
-        h1 { font-size: 1.8rem; text-align: center; margin: 0; font-weight: 900; letter-spacing: 1px; }
+        /* 【修正】タイトルを日本語に */
+        h1 { font-size: 1.8rem; text-align: center; margin: 0; font-weight: 900; letter-spacing: -1px; }
 
         /* リンク表示エリア */
         .display-card {
@@ -17,7 +23,7 @@
             min-height: 80px; max-height: 120px; overflow-y: auto;
             position: relative; border: 1px solid #eee;
         }
-        .url-line { font-size: 0.8rem; color: #1a73e8; margin-bottom: 2px; }
+        .url-line { font-size: 0.8rem; color: #1a73e8; margin-bottom: 2px; text-decoration: underline; word-break: break-all;}
         .copy-trigger { 
             position: absolute; top: 8px; right: 8px; background: #fff; 
             border: 1px solid #ddd; padding: 4px 12px; border-radius: 6px; 
@@ -37,16 +43,23 @@
             background: radial-gradient(circle at 50% 30%, #ffc0d4 0%, #ff0044 50%, #5e0018 100%);
             cursor: pointer; outline: none; position: relative;
             box-shadow: inset 0 12px 15px rgba(255,255,255,0.7), inset 0 -10px 20px rgba(0,0,0,0.5);
-            -webkit-tap-highlight-color: transparent; transition: transform 0.05s;
+            -webkit-tap-highlight-color: transparent; 
+            /* 【修正】アニメーション時間を少し短くしてキレを出す */
+            transition: transform 0.03s ease-out, box-shadow 0.03s ease-out; 
         }
         #mainBtn::after {
             content: ''; position: absolute; top: 12%; left: 25%; width: 50%; height: 22%;
             background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0));
             filter: blur(4px); border-radius: 50%;
         }
-        #mainBtn:active { transform: scale(0.94); }
 
-        /* 事務所への通報ボタン（最優先） */
+        /* 【修正】みんはや風：押した時の凹みアニメーション */
+        #mainBtn:active { 
+            transform: scale(0.92) translateY(2px); /* 少し小さく、かつ下に下がる */
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.6), inset 0 -5px 10px rgba(255,255,255,0.3); /* 影を逆にして奥に引っ込んだように見せる */
+        }
+
+        /* 事務所への通報ボタン */
         .office-report-btn { 
             width: 100%; padding: 22px; background: #000; color: #fff; border: none; 
             border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 1.3rem; 
@@ -72,10 +85,10 @@
 <body>
 
 <div class="container">
-    <h1>REPORT STACKER</h1>
+    <h1>通報リンク生成器</h1>
 
     <div class="display-card">
-        <button class="copy-trigger" id="copyBtn">Copy</button>
+        <button class="copy-trigger" id="copyBtn">コピー</button>
         <div id="urlContainer"></div>
     </div>
 
@@ -105,12 +118,34 @@
         </div>
     </div>
 
-    <div class="footer">REPORT STACKER Tool</div>
+    <div class="footer">通報リンク生成器 (v1.1)</div>
 </div>
 
 <script>
-    // 管理リンク（新しく見つけたらここに追加していってね）
-    const masterUrls = ["https://example.com/url1", "https://example.com/url2"]; 
+    /* 【修正】サンプルURLを15個に増量 */
+    const masterUrls = [
+        // X (Twitter)
+        "https://x.com/violation_user_01/status/1234567890123456789",
+        "https://x.com/violation_user_02/status/9876543210987654321",
+        "https://x.com/violation_user_03/status/1122334455667788990",
+        // Instagram
+        "https://www.instagram.com/p/C_abcdeF123/",
+        "https://www.instagram.com/p/C_ghijkL456/",
+        "https://www.instagram.com/reels/C_mnopqrS789/",
+        // TikTok
+        "https://www.tiktok.com/@akushitsu_user/video/7123456789012345678",
+        "https://www.tiktok.com/@tourou_user/video/7987654321098765432",
+        "https://www.tiktok.com/@fuhou_user/video/7112233445566778899",
+        // YouTube
+        "https://www.youtube.com/watch?v=sampleVideoID1",
+        "https://www.youtube.com/shorts/sampleShortsID2",
+        // Threads
+        "https://www.threads.net/@fuhou_user/post/C_fuhouPostID1",
+        // その他ダミー
+        "https://example.com/violation-page-01",
+        "https://example.com/violation-page-02",
+        "https://example.com/violation-page-03"
+    ]; 
     let pool = [...masterUrls];
     let stacked = [];
 
@@ -118,10 +153,10 @@
     const urlContainer = document.getElementById('urlContainer');
     const copyBtn = document.getElementById('copyBtn');
 
-    // ボタンクリックでランダム抽出
     mainBtn.addEventListener('click', () => {
         if (pool.length === 0) return;
-        if(navigator.vibrate) navigator.vibrate(15);
+        // バイブレーション（Androidなど対応端末のみ）
+        if(navigator.vibrate) navigator.vibrate(12);
         const idx = Math.floor(Math.random() * pool.length);
         const url = pool.splice(idx, 1)[0];
         stacked.push(url);
@@ -130,18 +165,16 @@
         urlContainer.prepend(div);
     });
 
-    // コピー機能
     copyBtn.addEventListener('click', () => {
         if (stacked.length === 0) return;
         if(navigator.vibrate) navigator.vibrate(40);
         navigator.clipboard.writeText(stacked.join('\n')).then(() => {
             const originalText = copyBtn.textContent;
-            copyBtn.textContent = "Done!";
-            setTimeout(() => copyBtn.textContent = originalText, 1500);
+            copyBtn.textContent = "完了！";
+            setTimeout(() => copyBtn.textContent = originalText, 1200);
         });
     });
 
-    // 折りたたみ開閉
     function toggleAccordion(element) {
         element.parentElement.classList.toggle('active');
     }
