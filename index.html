@@ -3,40 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>通報リンク生成器</title>
+    <title>ランダムリンク</title>
     <style>
         :root { --bg: #ffffff; --text: #1a1a1a; }
         body { 
             background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; 
             margin: 0; display: flex; flex-direction: column; align-items: center; 
-            /* 【修正】連打時のズーム防止 */
             touch-action: manipulation; 
+            -webkit-user-select: none; /* 長押し選択を防止 */
         }
-        .container { width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; }
-
-        /* 【修正】タイトルを日本語に */
-        h1 { font-size: 1.8rem; text-align: center; margin: 0; font-weight: 900; letter-spacing: -1px; }
-
-        /* リンク表示エリア */
-        .display-card {
-            background: #f8f9fa; border-radius: 12px; padding: 15px;
-            min-height: 80px; max-height: 120px; overflow-y: auto;
-            position: relative; border: 1px solid #eee;
-        }
-        .url-line { font-size: 0.8rem; color: #1a73e8; margin-bottom: 2px; text-decoration: underline; word-break: break-all;}
-        .copy-trigger { 
-            position: absolute; top: 8px; right: 8px; background: #fff; 
-            border: 1px solid #ddd; padding: 4px 12px; border-radius: 6px; 
-            font-size: 0.75rem; cursor: pointer; color: #5f6368; font-weight: bold;
+        .container { 
+            width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; 
+            display: flex; flex-direction: column; height: 100vh; /* 画面の高さに合わせる */
         }
 
-        /* 水晶玉ボタン（真上からの視点） */
-        .button-section { display: flex; justify-content: center; padding: 10px 0; }
+        h1 { font-size: 1.8rem; text-align: center; margin: 0 0 10px 0; font-weight: 900; }
+
+        /* 【修正】水晶玉ボタンを上に配置し、位置を固定 */
+        .button-section { 
+            display: flex; justify-content: center; padding: 20px 0; 
+            order: 1; /* 順番を固定 */
+        }
         .btn-base-flat {
             width: 170px; height: 170px;
             background: radial-gradient(circle, #444 0%, #111 80%, #000 100%);
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4); position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
         }
         #mainBtn {
             width: 135px; height: 135px; border: none; border-radius: 50%;
@@ -44,8 +36,7 @@
             cursor: pointer; outline: none; position: relative;
             box-shadow: inset 0 12px 15px rgba(255,255,255,0.7), inset 0 -10px 20px rgba(0,0,0,0.5);
             -webkit-tap-highlight-color: transparent; 
-            /* 【修正】アニメーション時間を少し短くしてキレを出す */
-            transition: transform 0.03s ease-out, box-shadow 0.03s ease-out; 
+            transition: transform 0.05s linear;
         }
         #mainBtn::after {
             content: ''; position: absolute; top: 12%; left: 25%; width: 50%; height: 22%;
@@ -53,98 +44,92 @@
             filter: blur(4px); border-radius: 50%;
         }
 
-        /* 【修正】みんはや風：押した時の凹みアニメーション */
-        #mainBtn:active { 
-            transform: scale(0.92) translateY(2px); /* 少し小さく、かつ下に下がる */
-            box-shadow: inset 0 5px 10px rgba(0,0,0,0.6), inset 0 -5px 10px rgba(255,255,255,0.3); /* 影を逆にして奥に引っ込んだように見せる */
+        /* 凹んだ時のスタイル */
+        .is-pressed { 
+            transform: scale(0.9) translateY(4px) !important;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.8) !important;
         }
 
-        /* 事務所への通報ボタン */
+        /* リンク表示エリア（ボタンの下に配置し、高さを固定） */
+        .display-card {
+            order: 2;
+            background: #f8f9fa; border-radius: 12px; padding: 15px;
+            height: 100px; overflow-y: auto;
+            position: relative; border: 1px solid #eee; margin-bottom: 15px;
+        }
+        .url-line { font-size: 0.8rem; color: #1a73e8; margin-bottom: 2px; word-break: break-all;}
+        .copy-trigger { 
+            position: absolute; top: 8px; right: 8px; background: #fff; 
+            border: 1px solid #ddd; padding: 4px 12px; border-radius: 6px; 
+            font-size: 0.75rem; cursor: pointer; color: #5f6368; font-weight: bold; z-index: 10;
+        }
+
+        /* 事務所ボタン */
         .office-report-btn { 
-            width: 100%; padding: 22px; background: #000; color: #fff; border: none; 
+            order: 3;
+            width: 100%; padding: 20px; background: #000; color: #fff; border: none; 
             border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 1.3rem; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2); text-decoration: none; text-align: center;
-            display: block; box-sizing: border-box;
+            text-decoration: none; text-align: center; display: block; box-sizing: border-box;
+            margin-bottom: 15px;
         }
 
-        /* アコーディオン設定 */
-        .accordion-item {
-            width: 100%; border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: #fff;
-        }
-        .accordion-header {
-            width: 100%; padding: 15px; background: #fff; border: none; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1rem; cursor: pointer;
-        }
-        .arrow { width: 10px; height: 10px; border-right: 2px solid #999; border-bottom: 2px solid #999; transform: rotate(45deg); transition: transform 0.3s; margin-right: 5px; }
+        /* フォーム類 */
+        .form-area { order: 4; display: flex; flex-direction: column; gap: 10px; }
+        .accordion-item { border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: #fff; }
+        .accordion-header { width: 100%; padding: 15px; background: #fff; border: none; display: flex; justify-content: space-between; align-items: center; font-weight: bold; cursor: pointer; }
+        .arrow { width: 8px; height: 8px; border-right: 2px solid #999; border-bottom: 2px solid #999; transform: rotate(45deg); transition: transform 0.3s; margin-right: 5px; }
         .accordion-item.active .arrow { transform: rotate(-135deg); }
         .accordion-content { display: none; border-top: 1px solid #eee; }
         .accordion-item.active .accordion-content { display: block; }
 
-        .footer { padding: 40px 0; color: #ccc; font-size: 0.7rem; }
     </style>
 </head>
-<body>
-
-<div class="container">
-    <h1>通報リンク生成器</h1>
-
-    <div class="display-card">
-        <button class="copy-trigger" id="copyBtn">コピー</button>
-        <div id="urlContainer"></div>
-    </div>
+<body oncontextmenu="return false;"> <div class="container">
+    <h1>ランダムリンク</h1>
 
     <div class="button-section">
         <div class="btn-base-flat"><button id="mainBtn"></button></div>
+    </div>
+
+    <div class="display-card">
+        <button class="copy-trigger" id="copyBtn">Copy</button>
+        <div id="urlContainer"></div>
     </div>
 
     <a href="https://starto.jp/s/p/form/question?cd=violation" target="_blank" class="office-report-btn">
         事務所へ通報する
     </a>
 
-    <div class="accordion-item">
-        <button class="accordion-header" onclick="toggleAccordion(this)">
-            ⚠️ 違反者の情報提供はこちら <span class="arrow"></span>
-        </button>
-        <div class="accordion-content">
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdgeB3B-xQJ5tw1xrZHzlxQKDqoX7CQF4BqMpkotaX0UPfUrw/viewform?embedded=true" width="100%" height="600" frameborder="0">読み込んでいます…</iframe>
+    <div class="form-area">
+        <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(this)">
+                ⚠️ 情報提供はこちら <span class="arrow"></span>
+            </button>
+            <div class="accordion-content">
+                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdgeB3B-xQJ5tw1xrZHzlxQKDqoX7CQF4BqMpkotaX0UPfUrw/viewform?embedded=true" width="100%" height="450" frameborder="0"></iframe>
+            </div>
+        </div>
+
+        <div class="accordion-item">
+            <button class="accordion-header" onclick="toggleAccordion(this)">
+                ✉️ ご意見・ご要望 <span class="arrow"></span>
+            </button>
+            <div class="accordion-content">
+                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe3dHNLs7cyLtGcsCyR7hPRHLwSiNWl0x7YfCsQdZI6LQgaXA/viewform?embedded=true" width="100%" height="450" frameborder="0"></iframe>
+            </div>
         </div>
     </div>
-
-    <div class="accordion-item">
-        <button class="accordion-header" onclick="toggleAccordion(this)">
-            ✉️ ツールへのご意見・ご要望 <span class="arrow"></span>
-        </button>
-        <div class="accordion-content">
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe3dHNLs7cyLtGcsCyR7hPRHLwSiNWl0x7YfCsQdZI6LQgaXA/viewform?embedded=true" width="100%" height="500" frameborder="0">読み込んでいます…</iframe>
-        </div>
-    </div>
-
-    <div class="footer">通報リンク生成器 (v1.1)</div>
 </div>
 
 <script>
-    /* 【修正】サンプルURLを15個に増量 */
     const masterUrls = [
-        // X (Twitter)
-        "https://x.com/violation_user_01/status/1234567890123456789",
-        "https://x.com/violation_user_02/status/9876543210987654321",
-        "https://x.com/violation_user_03/status/1122334455667788990",
-        // Instagram
-        "https://www.instagram.com/p/C_abcdeF123/",
-        "https://www.instagram.com/p/C_ghijkL456/",
-        "https://www.instagram.com/reels/C_mnopqrS789/",
-        // TikTok
-        "https://www.tiktok.com/@akushitsu_user/video/7123456789012345678",
-        "https://www.tiktok.com/@tourou_user/video/7987654321098765432",
-        "https://www.tiktok.com/@fuhou_user/video/7112233445566778899",
-        // YouTube
-        "https://www.youtube.com/watch?v=sampleVideoID1",
-        "https://www.youtube.com/shorts/sampleShortsID2",
-        // Threads
-        "https://www.threads.net/@fuhou_user/post/C_fuhouPostID1",
-        // その他ダミー
-        "https://example.com/violation-page-01",
-        "https://example.com/violation-page-02",
-        "https://example.com/violation-page-03"
+        "https://x.com/violation_user_01/status/1",
+        "https://x.com/violation_user_02/status/2",
+        "https://x.com/violation_user_03/status/3",
+        "https://www.instagram.com/p/A1/",
+        "https://www.instagram.com/p/B2/",
+        "https://www.tiktok.com/@user1/video/1",
+        "https://www.tiktok.com/@user2/video/2"
     ]; 
     let pool = [...masterUrls];
     let stacked = [];
@@ -153,25 +138,38 @@
     const urlContainer = document.getElementById('urlContainer');
     const copyBtn = document.getElementById('copyBtn');
 
-    mainBtn.addEventListener('click', () => {
-        if (pool.length === 0) return;
-        // バイブレーション（Androidなど対応端末のみ）
-        if(navigator.vibrate) navigator.vibrate(12);
-        const idx = Math.floor(Math.random() * pool.length);
-        const url = pool.splice(idx, 1)[0];
-        stacked.push(url);
-        const div = document.createElement('div');
-        div.className = 'url-line'; div.textContent = url;
-        urlContainer.prepend(div);
-    });
+    // 押し心地の改良：触れた瞬間に凹ませる
+    function pressStart(e) {
+        e.preventDefault();
+        mainBtn.classList.add('is-pressed');
+        if(navigator.vibrate) navigator.vibrate(15);
+        
+        if (pool.length > 0) {
+            const idx = Math.floor(Math.random() * pool.length);
+            const url = pool.splice(idx, 1)[0];
+            stacked.push(url);
+            const div = document.createElement('div');
+            div.className = 'url-line'; div.textContent = url;
+            urlContainer.prepend(div);
+        }
+    }
+
+    function pressEnd() {
+        mainBtn.classList.remove('is-pressed');
+    }
+
+    // マウスとタッチの両方に対応
+    mainBtn.addEventListener('touchstart', pressStart);
+    mainBtn.addEventListener('touchend', pressEnd);
+    mainBtn.addEventListener('mousedown', pressStart);
+    mainBtn.addEventListener('mouseup', pressEnd);
+    mainBtn.addEventListener('mouseleave', pressEnd);
 
     copyBtn.addEventListener('click', () => {
         if (stacked.length === 0) return;
-        if(navigator.vibrate) navigator.vibrate(40);
         navigator.clipboard.writeText(stacked.join('\n')).then(() => {
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = "完了！";
-            setTimeout(() => copyBtn.textContent = originalText, 1200);
+            copyBtn.textContent = "Done!";
+            setTimeout(() => copyBtn.textContent = "Copy", 1200);
         });
     });
 
