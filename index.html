@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>REPORT STACKER</title>
     <style>
-        :root { --bg: #ffffff; --text: #1a1a1a; --primary-red: #e0245e; }
+        :root { --bg: #ffffff; --text: #1a1a1a; }
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; }
 
-        h1 { font-size: 1.8rem; text-align: center; margin: 0; font-weight: 900; letter-spacing: 1px; color: #000; }
+        h1 { font-size: 1.8rem; text-align: center; margin: 0; font-weight: 900; letter-spacing: 1px; }
 
         /* リンク表示エリア */
         .display-card {
@@ -24,16 +24,16 @@
             font-size: 0.75rem; cursor: pointer; color: #5f6368; font-weight: bold;
         }
 
-        /* 水晶玉ボタン（真上からの視点） */
+        /* 水晶玉ボタン */
         .button-section { display: flex; justify-content: center; padding: 10px 0; }
         .btn-base-flat {
-            width: 180px; height: 180px;
+            width: 170px; height: 170px;
             background: radial-gradient(circle, #444 0%, #111 80%, #000 100%);
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
             box-shadow: 0 10px 25px rgba(0,0,0,0.4); position: relative;
         }
         #mainBtn {
-            width: 145px; height: 145px; border: none; border-radius: 50%;
+            width: 135px; height: 135px; border: none; border-radius: 50%;
             background: radial-gradient(circle at 50% 30%, #ffc0d4 0%, #ff0044 50%, #5e0018 100%);
             cursor: pointer; outline: none; position: relative;
             box-shadow: inset 0 12px 15px rgba(255,255,255,0.7), inset 0 -10px 20px rgba(0,0,0,0.5);
@@ -46,24 +46,27 @@
         }
         #mainBtn:active { transform: scale(0.94); }
 
-        /* 【最重要】事務所への通報ボタン */
+        /* 事務所への通報ボタン */
         .office-report-btn { 
-            width: 100%; padding: 25px; background: #000; color: #fff; border: none; 
-            border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 1.4rem; 
+            width: 100%; padding: 22px; background: #000; color: #fff; border: none; 
+            border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 1.3rem; 
             box-shadow: 0 10px 20px rgba(0,0,0,0.2); text-decoration: none; text-align: center;
             display: block; box-sizing: border-box;
         }
-        .office-report-btn:active { transform: scale(0.98); background: #333; }
 
-        /* Googleフォーム埋め込み */
-        .form-section { width: 100%; margin-top: 20px; text-align: center; }
-        .form-title { font-size: 0.9rem; font-weight: bold; margin-bottom: 10px; color: #666; }
-        .form-embed {
-            width: 100%; border-radius: 15px; overflow: hidden;
-            border: 2px solid #f0f0f0; background: #fff;
+        /* アコーディオン */
+        .accordion-item {
+            width: 100%; border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: #fff;
         }
+        .accordion-header {
+            width: 100%; padding: 15px; background: #fff; border: none; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 1rem; cursor: pointer;
+        }
+        .arrow { width: 10px; height: 10px; border-right: 2px solid #999; border-bottom: 2px solid #999; transform: rotate(45deg); transition: transform 0.3s; margin-right: 5px; }
+        .accordion-item.active .arrow { transform: rotate(-135deg); }
+        .accordion-content { display: none; border-top: 1px solid #eee; }
+        .accordion-item.active .accordion-content { display: block; }
 
-        .footer { padding: 30px 0; color: #ccc; font-size: 0.7rem; }
+        .footer { padding: 40px 0; color: #ccc; font-size: 0.7rem; }
     </style>
 </head>
 <body>
@@ -84,10 +87,21 @@
         事務所へ通報する
     </a>
 
-    <div class="form-section">
-        <div class="form-title">管理者にユーザーを報告する ↓</div>
-        <div class="form-embed">
-            <iframe src="https://docs.google.com/forms/d/e/【あなたのフォームID】/viewform?embedded=true" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe>
+    <div class="accordion-item">
+        <button class="accordion-header" onclick="toggleAccordion(this)">
+            ⚠️ 違反者の情報提供はこちら <span class="arrow"></span>
+        </button>
+        <div class="accordion-content">
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdgeB3B-xQJ5tw1xrZHzlxQKDqoX7CQF4BqMpkotaX0UPfUrw/viewform?embedded=true" width="100%" height="600" frameborder="0">読み込んでいます…</iframe>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+        <button class="accordion-header" onclick="toggleAccordion(this)">
+            ✉️ ツールへのご意見・ご要望 <span class="arrow"></span>
+        </button>
+        <div class="accordion-content">
+            <p style="padding:20px; font-size:0.8rem; color:#999;">フォームの準備中です。</p>
         </div>
     </div>
 
@@ -95,6 +109,7 @@
 </div>
 
 <script>
+    // 把握済みのURLをここに追加
     const masterUrls = ["https://example.com/url1", "https://example.com/url2"]; 
     let pool = [...masterUrls];
     let stacked = [];
@@ -103,7 +118,6 @@
     const urlContainer = document.getElementById('urlContainer');
     const copyBtn = document.getElementById('copyBtn');
 
-    // リンクを貯める
     mainBtn.addEventListener('click', () => {
         if (pool.length === 0) return;
         if(navigator.vibrate) navigator.vibrate(15);
@@ -115,7 +129,6 @@
         urlContainer.prepend(div);
     });
 
-    // コピー
     copyBtn.addEventListener('click', () => {
         if (stacked.length === 0) return;
         if(navigator.vibrate) navigator.vibrate(40);
@@ -125,6 +138,10 @@
             setTimeout(() => copyBtn.textContent = originalText, 1500);
         });
     });
+
+    function toggleAccordion(element) {
+        element.parentElement.classList.toggle('active');
+    }
 </script>
 
 </body>
