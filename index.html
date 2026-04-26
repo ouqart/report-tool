@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LINK BUSTER</title>
+    <title>REPORT STACKER</title>
     <style>
-        :root { --bg: #ffffff; --text: #1a1a1a; }
+        :root { --bg: #ffffff; --text: #1a1a1a; --primary-red: #e0245e; }
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
+        .container { width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; }
 
-        h1 { font-size: 1.5rem; text-align: center; margin: 0; font-weight: 900; letter-spacing: 1px; }
+        h1 { font-size: 1.8rem; text-align: center; margin: 0; font-weight: 900; letter-spacing: 1px; color: #000; }
 
         /* リンク表示エリア */
         .display-card {
@@ -20,12 +20,12 @@
         .url-line { font-size: 0.8rem; color: #1a73e8; margin-bottom: 2px; }
         .copy-trigger { 
             position: absolute; top: 8px; right: 8px; background: #fff; 
-            border: 1px solid #ddd; padding: 4px 10px; border-radius: 6px; 
-            font-size: 0.7rem; cursor: pointer; color: #5f6368;
+            border: 1px solid #ddd; padding: 4px 12px; border-radius: 6px; 
+            font-size: 0.75rem; cursor: pointer; color: #5f6368; font-weight: bold;
         }
 
         /* 水晶玉ボタン（真上からの視点） */
-        .button-section { display: flex; justify-content: center; padding: 15px 0; }
+        .button-section { display: flex; justify-content: center; padding: 10px 0; }
         .btn-base-flat {
             width: 180px; height: 180px;
             background: radial-gradient(circle, #444 0%, #111 80%, #000 100%);
@@ -46,39 +46,30 @@
         }
         #mainBtn:active { transform: scale(0.94); }
 
-        /* 設定エリア */
-        .settings-card { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
-        .checkbox-group { display: flex; gap: 5px; justify-content: space-between; margin-bottom: 15px; }
-        .checkbox-group label { font-size: 0.85rem; display: flex; align-items: center; gap: 5px; font-weight: bold; }
-        
-        .input-wrapper { position: relative; margin-bottom: 20px; }
-        .input-wrapper span { position: absolute; left: 12px; top: 11px; font-weight: bold; color: #1a1a1a; }
-        .input-wrapper input {
-            width: 100%; padding: 12px 12px 12px 30px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem;
+        /* 【最重要】事務所への通報ボタン */
+        .office-report-btn { 
+            width: 100%; padding: 25px; background: #000; color: #fff; border: none; 
+            border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 1.4rem; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); text-decoration: none; text-align: center;
+            display: block; box-sizing: border-box;
         }
-
-        /* 巨大・通報ボタン */
-        .send-btn { 
-            width: 100%; padding: 20px; background: #e0245e; color: white; border: none; 
-            border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.2rem; 
-            box-shadow: 0 6px 15px rgba(224, 36, 94, 0.4);
-        }
-        .send-btn:active { transform: scale(0.98); background: #b01d4a; }
+        .office-report-btn:active { transform: scale(0.98); background: #333; }
 
         /* Googleフォーム埋め込み */
+        .form-section { width: 100%; margin-top: 20px; text-align: center; }
+        .form-title { font-size: 0.9rem; font-weight: bold; margin-bottom: 10px; color: #666; }
         .form-embed {
-            width: 100%; margin-top: 20px; border-radius: 12px; overflow: hidden;
-            border: 1px solid #eee; display: none;
+            width: 100%; border-radius: 15px; overflow: hidden;
+            border: 2px solid #f0f0f0; background: #fff;
         }
 
-        .footer-links { text-align: center; padding: 20px 0; display: flex; flex-direction: column; gap: 10px; }
-        .report-link { color: #bbb; font-size: 0.75rem; text-decoration: underline; }
+        .footer { padding: 30px 0; color: #ccc; font-size: 0.7rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>LINK BUSTER</h1>
+    <h1>REPORT STACKER</h1>
 
     <div class="display-card">
         <button class="copy-trigger" id="copyBtn">Copy</button>
@@ -89,40 +80,30 @@
         <div class="btn-base-flat"><button id="mainBtn"></button></div>
     </div>
 
-    <div class="settings-card">
-        <div class="checkbox-group">
-            <label><input type="checkbox" value="X" class="app-check"> X</label>
-            <label><input type="checkbox" value="Instagram" class="app-check"> Instagram</label>
-            <label><input type="checkbox" value="TikTok" class="app-check"> TikTok</label>
+    <a href="https://starto.jp/s/p/form/question?cd=violation" target="_blank" class="office-report-btn">
+        事務所へ通報する
+    </a>
+
+    <div class="form-section">
+        <div class="form-title">管理者にユーザーを報告する ↓</div>
+        <div class="form-embed">
+            <iframe src="https://docs.google.com/forms/d/e/【あなたのフォームID】/viewform?embedded=true" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe>
         </div>
-        <div class="input-wrapper">
-            <span>@</span>
-            <input type="text" id="usernameInput" placeholder="ユーザーネーム">
-        </div>
-        
-        <button class="send-btn" id="toggleFormBtn">REPORT FORM</button>
     </div>
 
-    <div class="form-embed" id="formContainer">
-        <iframe src="https://docs.google.com/forms/d/e/【あなたのフォームID】/viewform?embedded=true" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0"></iframe>
-    </div>
-
-    <div class="footer-links">
-        <a href="https://starto.jp/s/p/form/question?cd=violation" target="_blank" class="report-link">事務所へ通報する</a>
-    </div>
+    <div class="footer">REPORT STACKER Tool</div>
 </div>
 
 <script>
-    const masterUrls = ["https://example.com/1", "https://example.com/2"]; 
+    const masterUrls = ["https://example.com/url1", "https://example.com/url2"]; 
     let pool = [...masterUrls];
     let stacked = [];
 
     const mainBtn = document.getElementById('mainBtn');
     const urlContainer = document.getElementById('urlContainer');
     const copyBtn = document.getElementById('copyBtn');
-    const toggleFormBtn = document.getElementById('toggleFormBtn');
-    const formContainer = document.getElementById('formContainer');
 
+    // リンクを貯める
     mainBtn.addEventListener('click', () => {
         if (pool.length === 0) return;
         if(navigator.vibrate) navigator.vibrate(15);
@@ -134,23 +115,15 @@
         urlContainer.prepend(div);
     });
 
+    // コピー
     copyBtn.addEventListener('click', () => {
         if (stacked.length === 0) return;
         if(navigator.vibrate) navigator.vibrate(40);
-        const selectedApps = Array.from(document.querySelectorAll('.app-check:checked')).map(c => c.value);
-        const user = document.getElementById('usernameInput').value;
-        const finalContent = `【${selectedApps.join('/')}】\n@${user}\n\n${stacked.join('\n')}`;
-        navigator.clipboard.writeText(finalContent).then(() => {
+        navigator.clipboard.writeText(stacked.join('\n')).then(() => {
+            const originalText = copyBtn.textContent;
             copyBtn.textContent = "Done!";
-            setTimeout(() => copyBtn.textContent = "Copy", 1500);
+            setTimeout(() => copyBtn.textContent = originalText, 1500);
         });
-    });
-
-    toggleFormBtn.addEventListener('click', () => {
-        formContainer.style.display = "block";
-        toggleFormBtn.textContent = "FILL OUT THE FORM ↓";
-        toggleFormBtn.style.background = "#555";
-        formContainer.scrollIntoView({ behavior: 'smooth' });
     });
 </script>
 
