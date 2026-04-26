@@ -3,187 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>URL Collector</title>
+    <title>URL Stack Master</title>
     <style>
-        :root {
-            --bg: #ffffff;
-            --text: #1a1a1a;
-            --accent-red: #ff0033;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+        :root { --bg: #ffffff; --text: #1a1a1a; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 400px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
 
         /* リンク表示エリア（Gemini風） */
         .display-card {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 15px;
-            min-height: 120px;
-            max-height: 200px;
-            overflow-y: auto;
-            position: relative;
-            border: 1px solid #eee;
+            background: #f8f9fa; border-radius: 12px; padding: 15px;
+            min-height: 80px; max-height: 120px; overflow-y: auto;
+            position: relative; border: 1px solid #eee;
+        }
+        .url-line { font-size: 0.8rem; color: #1a73e8; margin-bottom: 2px; }
+        .copy-trigger { 
+            position: absolute; top: 8px; right: 8px; background: #fff; 
+            border: 1px solid #ddd; padding: 4px 10px; border-radius: 6px; 
+            font-size: 0.7rem; cursor: pointer; color: #5f6368;
         }
 
-        .url-line {
-            font-size: 0.85rem;
-            color: #1a73e8;
-            margin-bottom: 4px;
-            word-break: break-all;
+        /* 真上から見た水晶玉ボタン（超光沢仕様） */
+        .button-section { display: flex; justify-content: center; padding: 20px 0; }
+        .btn-base-flat {
+            width: 170px; height: 170px;
+            background: radial-gradient(circle, #444 0%, #111 80%, #000 100%);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4); position: relative;
         }
-
-        /* コピーボタン */
-        .copy-trigger {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            color: #5f6368;
-            transition: background 0.2s;
-        }
-        .copy-trigger:active { background: #f0f0f0; }
-
-        /* ボタンセクション */
-        .button-section {
-            display: flex;
-            justify-content: center;
-            padding: 40px 0 20px;
-        }
-
-        /* 土台（黒いベース） */
-        .btn-base {
-            width: 180px;
-            height: 50px;
-            background: linear-gradient(to bottom, #333, #000);
-            border-radius: 50% / 30%;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-        }
-
-        /* 水晶玉のような赤ボタン（真上視点） */
         #mainBtn {
-            width: 140px;
-            height: 140px;
-            background: radial-gradient(circle at 50% 35%, #ff7ea5 0%, #ff0044 45%, #8b0022 100%);
-            border-radius: 50%;
-            border: none;
-            position: absolute;
-            top: -90px;
-            cursor: pointer;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-            transition: transform 0.1s;
+            width: 135px; height: 135px; border: none; border-radius: 50%;
+            /* 水晶玉のグラデーション：中心をずらして立体感を出す */
+            background: radial-gradient(circle at 50% 30%, #ffc0d4 0%, #ff0044 50%, #5e0018 100%);
+            cursor: pointer; outline: none; position: relative;
             box-shadow: 
-                inset 0 -10px 20px rgba(0,0,0,0.4),
-                inset 0 15px 25px rgba(255,255,255,0.6),
-                0 10px 20px rgba(0,0,0,0.3);
+                inset 0 12px 15px rgba(255,255,255,0.7), 
+                inset 0 -10px 20px rgba(0,0,0,0.5);
+            -webkit-tap-highlight-color: transparent; transition: transform 0.05s;
         }
-
-        /* 表面の水晶ハイライト */
-        #mainBtn::before {
-            content: '';
-            position: absolute;
-            top: 8%;
-            left: 20%;
-            width: 60%;
-            height: 30%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 100%);
-            border-radius: 50%;
+        /* 真上からの強いテカリ */
+        #mainBtn::after {
+            content: ''; position: absolute; top: 12%; left: 25%; width: 50%; height: 22%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0));
+            filter: blur(4px); border-radius: 50%;
         }
+        #mainBtn:active { transform: scale(0.94); opacity: 0.9; }
 
-        #mainBtn:active {
-            transform: translateY(10px) scale(0.98);
-            box-shadow: 
-                inset 0 -5px 15px rgba(0,0,0,0.4),
-                inset 0 10px 20px rgba(255,255,255,0.4),
-                0 5px 10px rgba(0,0,0,0.5);
-        }
-
-        /* 設定エリア（下部） */
-        .settings-card {
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            padding: 15px;
-        }
-
-        .checkbox-group {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 15px;
-            justify-content: center;
-        }
-
-        .checkbox-group label {
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .input-wrapper span {
-            position: absolute;
-            left: 12px;
-            color: #888;
-            font-weight: bold;
-        }
-
+        /* 入力・設定カード */
+        .settings-card { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
+        .checkbox-group { display: flex; gap: 5px; justify-content: space-between; margin-bottom: 15px; }
+        .checkbox-group label { font-size: 0.85rem; display: flex; align-items: center; gap: 5px; font-weight: bold; }
+        
+        .input-wrapper { position: relative; margin-bottom: 12px; }
+        .input-wrapper span { position: absolute; left: 12px; top: 11px; font-weight: bold; color: #1a1a1a; }
         .input-wrapper input {
-            width: 100%;
-            padding: 12px 12px 12px 30px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 1rem;
-            box-sizing: border-box;
+            width: 100%; padding: 12px 12px 12px 30px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem;
+        }
+        textarea { 
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; 
+            box-sizing: border-box; height: 60px; resize: none; margin-bottom: 15px; font-family: sans-serif;
         }
 
-        /* 通報リンク */
-        .report-section {
-            margin-top: auto;
-            text-align: center;
-            padding: 20px 0;
+        .send-btn { 
+            width: 100%; padding: 16px; background: #1a1a1a; color: white; border: none; 
+            border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1rem; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
+        .send-btn:active { transform: scale(0.98); background: #333; }
 
-        .report-link {
-            color: #aaa;
-            font-size: 0.8rem;
-            text-decoration: underline;
-        }
+        /* 下部リンク */
+        .footer-links { text-align: center; padding: 20px 0; display: flex; flex-direction: column; gap: 10px; }
+        .report-link { color: #bbb; font-size: 0.75rem; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -195,13 +84,14 @@
     </div>
 
     <div class="button-section">
-        <div class="btn-base">
+        <div class="btn-base-flat">
             <button id="mainBtn"></button>
         </div>
     </div>
 
     <div class="settings-card">
         <div class="checkbox-group">
+            <label><input type="checkbox" value="X" class="app-check"> X</label>
             <label><input type="checkbox" value="Instagram" class="app-check"> Instagram</label>
             <label><input type="checkbox" value="TikTok" class="app-check"> TikTok</label>
         </div>
@@ -209,21 +99,22 @@
             <span>@</span>
             <input type="text" id="usernameInput" placeholder="ユーザーネーム">
         </div>
+        <textarea id="opinionInput" placeholder="ツールへのご意見（任意）"></textarea>
+        <button class="send-btn" id="sendBtn">Googleフォームへ送る</button>
     </div>
 
-    <div class="report-section">
-        <a href="https://example-office.jp/report" target="_blank" class="report-link">事務所へ通報する</a>
+    <div class="footer-links">
+        <a href="https://starto.jp/s/p/form/question?cd=violation" target="_blank" class="report-link">事務所へ通報する</a>
     </div>
 </div>
 
 <script>
-    // 【管理者用】ここにURLのリストを入れます（重複は自動で排除されます）
+    // --- 【管理用】認識済みのURLリスト ---
+    // 新しく見つけたらここに足して保存してください
     const masterUrls = [
-        "https://example.com/url1",
-        "https://example.com/url2",
-        "https://example.com/url3",
-        "https://example.com/url4",
-        "https://example.com/url5"
+        "https://example.com/id001",
+        "https://example.com/id002",
+        "https://example.com/id003"
     ];
 
     let pool = [...masterUrls];
@@ -233,14 +124,9 @@
     const urlContainer = document.getElementById('urlContainer');
     const copyBtn = document.getElementById('copyBtn');
 
-    // 赤ボタンクリック：リンク生成
+    // 水晶玉を押してリンクを貯める
     mainBtn.addEventListener('click', () => {
-        if (pool.length === 0) {
-            alert("全てのリンクを使い切りました。");
-            return;
-        }
-
-        // 振動（iPhone/Android）
+        if (pool.length === 0) return alert("リストのURLをすべて貯めました");
         if(navigator.vibrate) navigator.vibrate(15);
 
         const idx = Math.floor(Math.random() * pool.length);
@@ -253,26 +139,29 @@
         urlContainer.prepend(div);
     });
 
-    // コピーボタンクリック
+    // Copyボタン（振動付き）
     copyBtn.addEventListener('click', () => {
         if (stacked.length === 0) return;
-
-        // コピー時の振動
         if(navigator.vibrate) navigator.vibrate(40);
-
+        
         const selectedApps = Array.from(document.querySelectorAll('.app-check:checked')).map(c => c.value);
         const user = document.getElementById('usernameInput').value;
-        
-        // テキストの組み立て
         const appPrefix = selectedApps.length > 0 ? `【${selectedApps.join('/')}】\n` : "";
         const userPrefix = user ? `@${user}\n\n` : "";
         const finalContent = appPrefix + userPrefix + stacked.join('\n');
 
         navigator.clipboard.writeText(finalContent).then(() => {
-            const originalText = copyBtn.textContent;
             copyBtn.textContent = "Done!";
-            setTimeout(() => copyBtn.textContent = originalText, 1500);
+            setTimeout(() => copyBtn.textContent = "Copy", 1500);
         });
+    });
+
+    // 送信ボタン（Googleフォームへ飛ばす）
+    document.getElementById('sendBtn').addEventListener('click', () => {
+        // あなたのGoogleフォームの編集用URLなど、管理画面へ飛ばすとチェックしやすいです
+        // もしくは回答用フォームのURLを入れてください
+        const formUrl = "https://docs.google.com/forms/d/e/あなたのフォームID/viewform"; 
+        window.open(formUrl, '_blank');
     });
 </script>
 
