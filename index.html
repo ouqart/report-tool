@@ -24,7 +24,7 @@
             font-size: 0.75rem; cursor: pointer; color: #5f6368; font-weight: bold;
         }
 
-        /* 水晶玉ボタン */
+        /* 水晶玉ボタン（真上からの視点） */
         .button-section { display: flex; justify-content: center; padding: 10px 0; }
         .btn-base-flat {
             width: 170px; height: 170px;
@@ -46,7 +46,7 @@
         }
         #mainBtn:active { transform: scale(0.94); }
 
-        /* 事務所への通報ボタン */
+        /* 事務所への通報ボタン（最優先） */
         .office-report-btn { 
             width: 100%; padding: 22px; background: #000; color: #fff; border: none; 
             border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 1.3rem; 
@@ -54,7 +54,7 @@
             display: block; box-sizing: border-box;
         }
 
-        /* アコーディオン */
+        /* アコーディオン設定 */
         .accordion-item {
             width: 100%; border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: #fff;
         }
@@ -101,7 +101,7 @@
             ✉️ ツールへのご意見・ご要望 <span class="arrow"></span>
         </button>
         <div class="accordion-content">
-            <p style="padding:20px; font-size:0.8rem; color:#999;">フォームの準備中です。</p>
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe3dHNLs7cyLtGcsCyR7hPRHLwSiNWl0x7YfCsQdZI6LQgaXA/viewform?embedded=true" width="100%" height="500" frameborder="0">読み込んでいます…</iframe>
         </div>
     </div>
 
@@ -109,7 +109,7 @@
 </div>
 
 <script>
-    // 把握済みのURLをここに追加
+    // 管理リンク（新しく見つけたらここに追加していってね）
     const masterUrls = ["https://example.com/url1", "https://example.com/url2"]; 
     let pool = [...masterUrls];
     let stacked = [];
@@ -118,6 +118,7 @@
     const urlContainer = document.getElementById('urlContainer');
     const copyBtn = document.getElementById('copyBtn');
 
+    // ボタンクリックでランダム抽出
     mainBtn.addEventListener('click', () => {
         if (pool.length === 0) return;
         if(navigator.vibrate) navigator.vibrate(15);
@@ -129,6 +130,7 @@
         urlContainer.prepend(div);
     });
 
+    // コピー機能
     copyBtn.addEventListener('click', () => {
         if (stacked.length === 0) return;
         if(navigator.vibrate) navigator.vibrate(40);
@@ -139,6 +141,7 @@
         });
     });
 
+    // 折りたたみ開閉
     function toggleAccordion(element) {
         element.parentElement.classList.toggle('active');
     }
