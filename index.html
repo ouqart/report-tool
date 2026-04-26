@@ -3,214 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Report Link Generator</title>
+    <title>Report Tool</title>
     <style>
         :root {
-            --primary: #e0245e;
-            --bg: #f5f8fa;
-            --card: #ffffff;
-            --text: #14171a;
+            --bg: #ffffff;      /* 背景は白 */
+            --text: #14171a;    /* 文字は黒系 */
+            --accent-red: #e0245e; /* つやつやボタンの赤 */
         }
 
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
             margin: 0;
             padding: 20px;
+            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background: var(--card);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            box-sizing: border-box;
-        }
-
-        h1 { font-size: 1.2rem; text-align: center; margin-bottom: 20px; color: var(--primary); }
-
-        /* 入力エリア */
-        textarea {
-            width: 100%;
-            height: 100px;
-            padding: 12px;
-            border: 2px solid #e1e8ed;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            box-sizing: border-box;
-            resize: none;
-            margin-bottom: 10px;
-        }
-        textarea:focus { border-color: var(--primary); outline: none; }
-
-        .setup-btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--text);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: bold;
-            margin-bottom: 30px;
-        }
+        h1 { font-size: 1.3rem; margin-top: 20px; }
 
         /* カウンター表示 */
-        .counter-box {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 15px;
+        .status {
+            font-size: 1.1rem;
+            margin: 30px 0 50px 0;
+            background: #f5f8fa;
+            padding: 20px 40px;
+            border-radius: 50px;
+            border: 1px solid #e1e8ed;
         }
-        #stackCount { font-size: 2.5rem; font-weight: bold; color: var(--primary); }
+        #stackCount {
+            font-size: 2.8rem;
+            color: var(--accent-red);
+            font-weight: bold;
+            margin: 0 10px;
+        }
 
-        /* つやつやボタン */
-        .btn-wrapper {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-        }
+        /* 赤い丸でつやつやのボタン */
         #addBtn {
-            width: 140px;
-            height: 140px;
+            width: 160px;
+            height: 160px;
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: white;
             border: none;
             border-radius: 50%;
-            background: linear-gradient(145deg, #ff2a6f, #ca2055);
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 10px 10px 30px #d1d9e6, -10px -10px 30px #ffffff, inset 8px 8px 15px #ff3b81;
-            position: relative;
             cursor: pointer;
+            position: relative;
+            background: linear-gradient(145deg, #ff2a6f, #ca2055);
+            /* 外側の影と内側のつや */
+            box-shadow: 
+                0 10px 25px rgba(224, 36, 94, 0.4),
+                inset 10px 10px 15px #ff3b81,
+                inset -10px -10px 15px #a81b47;
             touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            transition: transform 0.05s;
         }
+
+        /* つや出しのハイライト（光沢） */
         #addBtn::after {
-            content: ''; position: absolute; top: 10%; left: 15%; width: 70%; height: 35%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0));
+            content: '';
+            position: absolute;
+            top: 8%;
+            left: 15%;
+            width: 70%;
+            height: 35%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.45), rgba(255,255,255,0));
             border-radius: 50%;
         }
-        #addBtn:active { transform: scale(0.95); box-shadow: inset 5px 5px 10px #a81b47; }
-        #addBtn:disabled { background: #ccd6dd; box-shadow: none; }
+
+        /* 押した時の凹みと縮小 */
+        #addBtn:active {
+            transform: scale(0.92) translateY(4px);
+            box-shadow: inset 12px 12px 20px #a81b47, inset -12px -12px 20px #ff3b81;
+        }
+
+        #addBtn:disabled { background: #ccd6dd; box-shadow: none; opacity: 0.7; }
 
         /* コピーボタン */
         .copy-btn {
             width: 100%;
-            padding: 18px;
-            background: var(--primary);
+            max-width: 320px;
+            padding: 20px;
+            background: var(--accent-red);
             color: white;
             border: none;
             border-radius: 50px;
-            font-size: 1.1rem;
             font-weight: bold;
-            margin-top: 20px;
-            box-shadow: 0 4px 12px rgba(224, 36, 94, 0.3);
+            font-size: 1.2rem;
+            margin-top: 60px;
+            box-shadow: 0 5px 15px rgba(224, 36, 94, 0.3);
+            cursor: pointer;
         }
+        .copy-btn:active { transform: scale(0.98); background: #ca2055; }
 
-        .footer-link {
-            margin-top: 30px;
-            font-size: 0.8rem;
-            color: #657786;
-        }
+        /* 報告窓口（フッター） */
+        .form-section { margin-top: auto; padding: 40px 20px; width: 100%; border-top: 1px solid #e1e8ed; }
+        .form-link { color: #657786; text-decoration: none; font-size: 0.9rem; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Report Link Generator</h1>
+    <h1>通報支援スタック</h1>
 
-    <p style="font-size: 0.8rem; font-weight: bold; margin-bottom: 5px;">① 通報対象のURLを入力（1行に1つ）</p>
-    <textarea id="urlInput" placeholder="https://x.com/..."></textarea>
-    <button class="setup-btn" onclick="setupList()">リストをセットする</button>
+    <div class="status">
+        選択中: <span id="stackCount">0</span> / 50
+    </div>
+    
+    <button id="addBtn">貯める</button>
 
-    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+    <button id="finalCopyBtn" class="copy-btn">一括コピーする</button>
 
-    <div class="counter-box">
-        <span id="stackCount">0</span> <small>/ 50 件</small>
+    <div class="form-section">
+        <a href="https://forms.google.com/" target="_blank" class="form-link">通報候補を報告する ↗</a>
     </div>
 
-    <div class="btn-wrapper">
-        <button id="addBtn">貯める</button>
-    </div>
+    <script>
+        // ★【管理者用】ここに通報してほしいURLを好きなだけ並べてください
+        const masterList = [
+            "https://x.com/sample_user/status/1",
+            "https://x.com/sample_user/status/2",
+            "https://x.com/sample_user/status/3",
+            "https://x.com/sample_user/status/4",
+            "https://x.com/sample_user/status/5"
+            // まだまだ増やせます！
+        ];
 
-    <button id="finalCopyBtn" class="copy-btn" onclick="copyResult()">結果をコピーする</button>
-</div>
+        let selectedStack = [];
+        let timer = null;
+        
+        const btn = document.getElementById('addBtn');
+        const countDisplay = document.getElementById('stackCount');
 
-<div class="footer-link">
-    <a href="https://forms.google.com/" style="color: #657786; text-decoration: none;">報告フォームはこちら ↗</a>
-</div>
-
-<script>
-    let masterList = [];
-    let selectedStack = [];
-    let timer = null;
-
-    const btn = document.getElementById('addBtn');
-    const countDisplay = document.getElementById('stackCount');
-
-    // リストをセットする
-    function setupList() {
-        const input = document.getElementById('urlInput').value;
-        masterList = input.split('\n').filter(url => url.trim() !== "");
-        if(masterList.length === 0) {
-            alert("URLを1つ以上入力してください");
-        } else {
-            alert(masterList.length + "件のURLを読み込みました！下のボタンで貯めてください。");
-            resetStack();
+        // URLを1つ追加する処理
+        function addLink() {
+            if (selectedStack.length >= 50) {
+                stop();
+                btn.disabled = true;
+                btn.textContent = "満タン";
+                if(navigator.vibrate) navigator.vibrate([100, 50, 100]); // 完了の振動
+                return;
+            }
+            // masterListからランダムに1つ選んでスタックに入れる
+            const randomUrl = masterList[Math.floor(Math.random() * masterList.length)];
+            selectedStack.push(randomUrl);
+            countDisplay.textContent = selectedStack.length;
+            
+            // 触感（指にプルッとくる振動）
+            if(navigator.vibrate) navigator.vibrate(15); 
         }
-    }
 
-    function addLink() {
-        if (masterList.length === 0) {
-            alert("先に上の入力欄にURLをセットしてください");
-            stop();
-            return;
+        // 長押し・クリック開始
+        function start(e) {
+            e.preventDefault();
+            if(btn.disabled) return;
+            addLink(); 
+            timer = setInterval(addLink, 100); // 0.1秒ごとにトントントンと増える
         }
-        if (selectedStack.length >= 50) {
-            stop();
-            btn.disabled = true;
-            if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
-            return;
+
+        // 指を離した時に停止
+        function stop() { 
+            clearInterval(timer); 
+            timer = null; 
         }
-        const randomUrl = masterList[Math.floor(Math.random() * masterList.length)];
-        selectedStack.push(randomUrl);
-        countDisplay.textContent = selectedStack.length;
-        if(navigator.vibrate) navigator.vibrate(15);
-    }
 
-    function start(e) {
-        e.preventDefault();
-        if(btn.disabled) return;
-        addLink();
-        timer = setInterval(addLink, 100);
-    }
+        // イベント登録（スマホとPC両対応）
+        btn.addEventListener('touchstart', start);
+        btn.addEventListener('touchend', stop);
+        btn.addEventListener('touchcancel', stop);
+        btn.addEventListener('mousedown', start);
+        btn.addEventListener('mouseup', stop);
+        btn.addEventListener('mouseleave', stop);
 
-    function stop() { clearInterval(timer); timer = null; }
-
-    function resetStack() {
-        selectedStack = [];
-        countDisplay.textContent = "0";
-        btn.disabled = false;
-    }
-
-    function copyResult() {
-        if (selectedStack.length === 0) return alert("まずは貯めてください");
-        const text = selectedStack.join('\n');
-        navigator.clipboard.writeText(text);
-        alert(selectedStack.length + "件コピーしました！");
-    }
-
-    btn.addEventListener('touchstart', start);
-    btn.addEventListener('touchend', stop);
-    btn.addEventListener('touchcancel', stop);
-    btn.addEventListener('mousedown', start);
-    btn.addEventListener('mouseup', stop);
-</script>
-
+        // コピー処理
+        document.getElementById('finalCopyBtn').addEventListener('click', async () => {
+            if (selectedStack.length === 0) return alert("まだ貯まっていません");
+            
+            const textToCopy = selectedStack.join('\n');
+            await navigator.clipboard.writeText(textToCopy);
+            
+            alert(selectedStack.length + "件のURLをコピーしました！");
+            
+            // リセット
+            selectedStack = [];
+            countDisplay.textContent = "0";
+            btn.disabled = false;
+            btn.textContent = "貯める";
+        });
+    </script>
 </body>
 </html>
