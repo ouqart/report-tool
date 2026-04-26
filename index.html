@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Generator</title>
+    <title>URL Stack Professional</title>
     <style>
         :root {
-            --primary: #e0245e; /* つやつやボタンの赤 */
-            --bg: #ffffff;      /* 背景は白でスッキリ */
-            --input-bg: #f5f8fa;
+            --bg: #f8f9fa;
+            --text: #333;
+            --accent: #e0245e;
         }
 
         body {
             background: var(--bg);
-            color: #14171a;
+            color: var(--text);
             font-family: -apple-system, sans-serif;
             margin: 0;
             padding: 20px;
@@ -30,172 +30,193 @@
             gap: 20px;
         }
 
-        h1 { font-size: 1.2rem; text-align: center; margin: 10px 0; }
-
-        /* 入力ボックス：リンク先のサイトに近いデザイン */
-        textarea {
-            width: 100%;
-            height: 120px;
+        /* ユーザー設定エリア */
+        .user-config {
+            background: white;
             padding: 15px;
-            border: 2px solid #e1e8ed;
             border-radius: 15px;
-            background: var(--input-bg);
-            font-size: 1rem;
-            box-sizing: border-box;
-            resize: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        textarea:focus { border-color: var(--primary); outline: none; background: #fff; }
 
-        /* セットボタン */
-        .action-btn {
-            width: 100%;
+        select, input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        input { flex: 1; }
+
+        /* スタック表示エリア（Gemini風） */
+        .stack-display {
+            background: #ffffff;
+            border: 1px solid #e1e8ed;
+            border-radius: 12px;
+            min-height: 100px;
+            max-height: 250px;
+            overflow-y: auto;
             padding: 15px;
-            background: #14171a;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
+            position: relative;
         }
 
-        /* カウンター表示 */
-        .counter {
-            text-align: center;
-            font-size: 1rem;
-            font-weight: bold;
-            color: var(--primary);
+        .url-item {
+            font-size: 0.85rem;
+            color: #1a73e8;
+            word-break: break-all;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 3px;
         }
-        #stackCount { font-size: 2.5rem; display: block; }
+
+        /* コピーボタン（Gemini風アイコンボタン） */
+        .copy-icon-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f1f3f4;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            color: #5f6368;
+        }
+        .copy-icon-btn:hover { background: #e8eaed; }
 
         /* 赤いつやつやボタン */
         .main-btn-outer {
             display: flex;
-            justify-content: center;
-            padding: 10px 0;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
         }
+
         #addBtn {
-            width: 140px;
-            height: 140px;
+            width: 150px;
+            height: 150px;
             border: none;
             border-radius: 50%;
-            background: linear-gradient(145deg, #ff2a6f, #ca2055);
-            color: white;
-            font-weight: bold;
-            font-size: 1.3rem;
-            box-shadow: 0 10px 20px rgba(224, 36, 94, 0.3), inset 8px 8px 15px #ff3b81;
+            /* 画像の赤ボタンを再現するグラデーション */
+            background: radial-gradient(circle at 30% 30%, #ff4d7d, #b3003b);
+            box-shadow: 
+                0 15px 0 #80002a, /* 底の厚み */
+                0 20px 30px rgba(0,0,0,0.3);
             position: relative;
             cursor: pointer;
-            touch-action: manipulation;
+            transition: all 0.1s;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
-        #addBtn::after {
-            content: ''; position: absolute; top: 10%; left: 15%; width: 70%; height: 30%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0));
+
+        #addBtn::before {
+            content: '';
+            position: absolute;
+            top: 10%; left: 20%; width: 60%; height: 30%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
             border-radius: 50%;
         }
-        #addBtn:active { transform: scale(0.95); }
-        #addBtn:disabled { background: #ccd6dd; box-shadow: none; }
 
-        /* コピーボタン */
-        .copy-btn {
-            width: 100%;
-            padding: 18px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(224, 36, 94, 0.3);
+        #addBtn:active {
+            transform: translateY(10px);
+            box-shadow: 
+                0 5px 0 #80002a,
+                0 10px 15px rgba(0,0,0,0.3);
+        }
+
+        /* 通報リンク */
+        .report-link {
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.8rem;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>URLスタックメーカー</h1>
+    <div class="user-config">
+        <select id="appSelect">
+            <option value="X">X (Twitter)</option>
+            <option value="Instagram">Instagram</option>
+            <option value="TikTok">TikTok</option>
+            <option value="Other">その他</option>
+        </select>
+        <input type="text" id="userName" placeholder="ユーザーネームを入力">
+    </div>
 
-    <textarea id="urlInput" placeholder="ここにURLを1行ずつ貼り付けてください"></textarea>
-    
-    <button class="action-btn" onclick="setupList()">URLをセットする</button>
-
-    <div class="counter">
-        <span id="stackCount">0</span>
-        <small>件スタック中 / 最大50件</small>
+    <div class="stack-display" id="displayArea">
+        <button class="copy-icon-btn" onclick="copyResult()">
+            <span>📋</span> Copy
+        </button>
+        <div id="urlList"></div>
     </div>
 
     <div class="main-btn-outer">
-        <button id="addBtn">貯める</button>
+        <button id="addBtn"></button>
+        <p style="font-size: 0.8rem; color: #999; margin-top: 15px;">ボタンを押してリンクを生成</p>
     </div>
 
-    <button id="finalCopyBtn" class="copy-btn" onclick="copyResult()">一括コピーする</button>
+    <a href="https://docs.google.com/forms/..." target="_blank" class="report-link">⚠️ 問題を報告する（通報フォーム）</a>
 </div>
 
 <script>
-    let masterList = [];
+    // ここに重複させたくないURLの元データを入れます
+    const rawUrls = [
+        "https://example.com/1",
+        "https://example.com/2",
+        "https://example.com/3",
+        "https://example.com/4",
+        "https://example.com/5"
+        // ... 必要なだけ追加
+    ];
+
+    let availableUrls = [...rawUrls]; // まだ使っていないURL
     let selectedStack = [];
-    let timer = null;
 
+    const urlListDiv = document.getElementById('urlList');
     const btn = document.getElementById('addBtn');
-    const countDisplay = document.getElementById('stackCount');
 
-    // 1. 入力されたURLを読み込む
-    function setupList() {
-        const text = document.getElementById('urlInput').value;
-        masterList = text.split('\n').map(line => line.trim()).filter(line => line !== "");
-        
-        if (masterList.length === 0) {
-            alert("URLを入力してください！");
-            return;
-        }
-        
-        selectedStack = [];
-        countDisplay.textContent = "0";
-        btn.disabled = false;
-        alert(masterList.length + "件のURLをセットしました。");
-    }
-
-    // 2. スタックに追加する（一定リズム連射）
     function addLink() {
-        if (masterList.length === 0) {
-            alert("先に上のボタンでURLをセットしてください");
-            stop();
-            return;
-        }
-        if (selectedStack.length >= 50) {
-            stop();
-            btn.disabled = true;
-            if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        if (availableUrls.length === 0) {
+            alert("全てのリンクを使い切りました。");
             return;
         }
 
-        const randomUrl = masterList[Math.floor(Math.random() * masterList.length)];
-        selectedStack.push(randomUrl);
-        countDisplay.textContent = selectedStack.length;
+        // ランダムに1つ選んで、元のリストから削除（重複防止）
+        const randomIndex = Math.floor(Math.random() * availableUrls.length);
+        const pickedUrl = availableUrls.splice(randomIndex, 1)[0];
 
-        if(navigator.vibrate) navigator.vibrate(15);
+        selectedStack.push(pickedUrl);
+
+        // 画面に表示
+        const item = document.createElement('div');
+        item.className = 'url-item';
+        item.textContent = pickedUrl;
+        urlListDiv.prepend(item); // 上に追加していく
+
+        if(navigator.vibrate) navigator.vibrate(20);
     }
-
-    function start(e) {
-        e.preventDefault();
-        if(btn.disabled) return;
-        addLink();
-        timer = setInterval(addLink, 100);
-    }
-
-    function stop() { clearInterval(timer); timer = null; }
 
     function copyResult() {
-        if (selectedStack.length === 0) return alert("まだ貯まっていません");
-        navigator.clipboard.writeText(selectedStack.join('\n'));
-        alert("コピー完了！");
+        if (selectedStack.length === 0) return;
+        
+        const app = document.getElementById('appSelect').value;
+        const user = document.getElementById('userName').value || "未入力";
+        
+        const textToCopy = `【${app}】\nユーザー: ${user}\n\n${selectedStack.join('\n')}`;
+        
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            alert("コピーしました！");
+        });
     }
 
-    btn.addEventListener('touchstart', start);
-    btn.addEventListener('touchend', stop);
-    btn.addEventListener('touchcancel', stop);
-    btn.addEventListener('mousedown', start);
-    btn.addEventListener('mouseup', stop);
+    btn.addEventListener('click', addLink);
 </script>
 
 </body>
