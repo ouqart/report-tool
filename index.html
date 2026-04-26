@@ -3,59 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ランダムリンク</title>
+    <title>タイトル未定</title>
     <style>
         :root { --bg: #ffffff; --text: #1a1a1a; }
         body { 
             background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; 
             margin: 0; display: flex; flex-direction: column; align-items: center; 
             touch-action: manipulation; 
-            -webkit-user-select: none; /* 長押し選択を防止 */
+            -webkit-user-select: none; 
+            overflow-x: hidden;
         }
+        
         .container { 
             width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; 
-            display: flex; flex-direction: column; height: 100vh; /* 画面の高さに合わせる */
+            display: flex; flex-direction: column; 
         }
 
-        h1 { font-size: 1.8rem; text-align: center; margin: 0 0 10px 0; font-weight: 900; }
+        /* タイトルエリア（仮） */
+        .title-area {
+            height: 50px; display: flex; align-items: center; justify-content: center;
+        }
+        h1 { font-size: 1.8rem; text-align: center; margin: 0; font-weight: 900; }
 
-        /* 【修正】水晶玉ボタンを上に配置し、位置を固定 */
+        /* ボタンの位置を完全に固定 */
         .button-section { 
-            display: flex; justify-content: center; padding: 20px 0; 
-            order: 1; /* 順番を固定 */
+            height: 210px; display: flex; justify-content: center; align-items: center;
         }
         .btn-base-flat {
             width: 170px; height: 170px;
             background: radial-gradient(circle, #444 0%, #111 80%, #000 100%);
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
         #mainBtn {
             width: 135px; height: 135px; border: none; border-radius: 50%;
             background: radial-gradient(circle at 50% 30%, #ffc0d4 0%, #ff0044 50%, #5e0018 100%);
             cursor: pointer; outline: none; position: relative;
-            box-shadow: inset 0 12px 15px rgba(255,255,255,0.7), inset 0 -10px 20px rgba(0,0,0,0.5);
+            box-shadow: inset 0 10px 12px rgba(255,255,255,0.6), inset 0 -8px 15px rgba(0,0,0,0.4);
             -webkit-tap-highlight-color: transparent; 
-            transition: transform 0.05s linear;
+            transition: transform 0.04s linear;
         }
         #mainBtn::after {
             content: ''; position: absolute; top: 12%; left: 25%; width: 50%; height: 22%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0));
-            filter: blur(4px); border-radius: 50%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.7), rgba(255,255,255,0));
+            filter: blur(3px); border-radius: 50%;
         }
 
-        /* 凹んだ時のスタイル */
+        /* みんはや風の凹み */
         .is-pressed { 
-            transform: scale(0.9) translateY(4px) !important;
-            box-shadow: inset 0 10px 20px rgba(0,0,0,0.8) !important;
+            transform: scale(0.92) translateY(3px) !important;
+            box-shadow: inset 0 12px 18px rgba(0,0,0,0.8) !important;
         }
 
-        /* リンク表示エリア（ボタンの下に配置し、高さを固定） */
+        /* リンク表示エリア（高さを固定してガタつき防止） */
         .display-card {
-            order: 2;
             background: #f8f9fa; border-radius: 12px; padding: 15px;
             height: 100px; overflow-y: auto;
-            position: relative; border: 1px solid #eee; margin-bottom: 15px;
+            position: relative; border: 1px solid #eee; margin-bottom: 20px;
         }
         .url-line { font-size: 0.8rem; color: #1a73e8; margin-bottom: 2px; word-break: break-all;}
         .copy-trigger { 
@@ -64,28 +68,34 @@
             font-size: 0.75rem; cursor: pointer; color: #5f6368; font-weight: bold; z-index: 10;
         }
 
-        /* 事務所ボタン */
+        /* 通報フォームボタン（黒） */
         .office-report-btn { 
-            order: 3;
             width: 100%; padding: 20px; background: #000; color: #fff; border: none; 
             border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 1.3rem; 
             text-decoration: none; text-align: center; display: block; box-sizing: border-box;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
-        /* フォーム類 */
-        .form-area { order: 4; display: flex; flex-direction: column; gap: 10px; }
-        .accordion-item { border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: #fff; }
-        .accordion-header { width: 100%; padding: 15px; background: #fff; border: none; display: flex; justify-content: space-between; align-items: center; font-weight: bold; cursor: pointer; }
+        /* フォームバナー（アコーディオン） */
+        .accordion-item { border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 10px; }
+        .accordion-header { 
+            width: 100%; padding: 15px; background: #fff; border: none; 
+            display: flex; justify-content: space-between; align-items: center; 
+            font-weight: bold; cursor: pointer; font-size: 0.95rem;
+        }
         .arrow { width: 8px; height: 8px; border-right: 2px solid #999; border-bottom: 2px solid #999; transform: rotate(45deg); transition: transform 0.3s; margin-right: 5px; }
         .accordion-item.active .arrow { transform: rotate(-135deg); }
-        .accordion-content { display: none; border-top: 1px solid #eee; }
+        .accordion-content { display: none; border-top: 1px solid #eee; background: #fcfcfc; }
         .accordion-item.active .accordion-content { display: block; }
 
     </style>
 </head>
-<body oncontextmenu="return false;"> <div class="container">
-    <h1>ランダムリンク</h1>
+<body oncontextmenu="return false;">
+
+<div class="container">
+    <div class="title-area">
+        <h1 id="appTitle">ランダムリンク</h1>
+    </div>
 
     <div class="button-section">
         <div class="btn-base-flat"><button id="mainBtn"></button></div>
@@ -97,7 +107,7 @@
     </div>
 
     <a href="https://starto.jp/s/p/form/question?cd=violation" target="_blank" class="office-report-btn">
-        事務所へ通報する
+        通報フォーム
     </a>
 
     <div class="form-area">
@@ -138,11 +148,11 @@
     const urlContainer = document.getElementById('urlContainer');
     const copyBtn = document.getElementById('copyBtn');
 
-    // 押し心地の改良：触れた瞬間に凹ませる
+    // 触れた瞬間の反応
     function pressStart(e) {
-        e.preventDefault();
+        // e.preventDefault(); // これを外すとクリックも効くようになります
         mainBtn.classList.add('is-pressed');
-        if(navigator.vibrate) navigator.vibrate(15);
+        if(navigator.vibrate) navigator.vibrate(12);
         
         if (pool.length > 0) {
             const idx = Math.floor(Math.random() * pool.length);
@@ -158,8 +168,8 @@
         mainBtn.classList.remove('is-pressed');
     }
 
-    // マウスとタッチの両方に対応
-    mainBtn.addEventListener('touchstart', pressStart);
+    // イベント登録
+    mainBtn.addEventListener('touchstart', (e) => { e.preventDefault(); pressStart(); });
     mainBtn.addEventListener('touchend', pressEnd);
     mainBtn.addEventListener('mousedown', pressStart);
     mainBtn.addEventListener('mouseup', pressEnd);
@@ -173,8 +183,10 @@
         });
     });
 
+    // 動きを最小限にするための開閉処理
     function toggleAccordion(element) {
-        element.parentElement.classList.toggle('active');
+        const item = element.parentElement;
+        item.classList.toggle('active');
     }
 </script>
 
