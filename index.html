@@ -7,9 +7,9 @@
     <style>
         :root { --bg: #ffffff; --text: #1a1a1a; }
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 400px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
+        .container { width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
 
-        /* リンク表示エリア（Gemini風） */
+        /* リンク表示エリア */
         .display-card {
             background: #f8f9fa; border-radius: 12px; padding: 15px;
             min-height: 80px; max-height: 120px; overflow-y: auto;
@@ -22,53 +22,52 @@
             font-size: 0.7rem; cursor: pointer; color: #5f6368;
         }
 
-        /* 真上から見た水晶玉ボタン（超光沢仕様） */
+        /* 真上から見た水晶玉ボタン */
         .button-section { display: flex; justify-content: center; padding: 20px 0; }
         .btn-base-flat {
-            width: 170px; height: 170px;
+            width: 180px; height: 180px;
             background: radial-gradient(circle, #444 0%, #111 80%, #000 100%);
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
             box-shadow: 0 10px 25px rgba(0,0,0,0.4); position: relative;
         }
         #mainBtn {
-            width: 135px; height: 135px; border: none; border-radius: 50%;
-            /* 水晶玉のグラデーション：中心をずらして立体感を出す */
+            width: 145px; height: 145px; border: none; border-radius: 50%;
             background: radial-gradient(circle at 50% 30%, #ffc0d4 0%, #ff0044 50%, #5e0018 100%);
             cursor: pointer; outline: none; position: relative;
-            box-shadow: 
-                inset 0 12px 15px rgba(255,255,255,0.7), 
-                inset 0 -10px 20px rgba(0,0,0,0.5);
+            box-shadow: inset 0 12px 15px rgba(255,255,255,0.7), inset 0 -10px 20px rgba(0,0,0,0.5);
             -webkit-tap-highlight-color: transparent; transition: transform 0.05s;
         }
-        /* 真上からの強いテカリ */
         #mainBtn::after {
             content: ''; position: absolute; top: 12%; left: 25%; width: 50%; height: 22%;
             background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0));
             filter: blur(4px); border-radius: 50%;
         }
-        #mainBtn:active { transform: scale(0.94); opacity: 0.9; }
+        #mainBtn:active { transform: scale(0.94); }
 
-        /* 入力・設定カード */
+        /* SNS設定エリア */
         .settings-card { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
         .checkbox-group { display: flex; gap: 5px; justify-content: space-between; margin-bottom: 15px; }
         .checkbox-group label { font-size: 0.85rem; display: flex; align-items: center; gap: 5px; font-weight: bold; }
         
-        .input-wrapper { position: relative; margin-bottom: 12px; }
+        .input-wrapper { position: relative; margin-bottom: 15px; }
         .input-wrapper span { position: absolute; left: 12px; top: 11px; font-weight: bold; color: #1a1a1a; }
         .input-wrapper input {
             width: 100%; padding: 12px 12px 12px 30px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem;
         }
-        textarea { 
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; 
-            box-sizing: border-box; height: 60px; resize: none; margin-bottom: 15px; font-family: sans-serif;
-        }
 
+        /* 超巨大・通報ボタン */
         .send-btn { 
-            width: 100%; padding: 16px; background: #1a1a1a; color: white; border: none; 
-            border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1rem; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            width: 100%; padding: 20px; background: #e0245e; color: white; border: none; 
+            border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.2rem; 
+            box-shadow: 0 6px 15px rgba(224, 36, 94, 0.4); transition: background 0.2s;
         }
-        .send-btn:active { transform: scale(0.98); background: #333; }
+        .send-btn:active { transform: scale(0.98); background: #b01d4a; }
+
+        /* Googleフォーム埋め込みエリア */
+        .form-embed {
+            width: 100%; margin-top: 20px; border-radius: 12px; overflow: hidden;
+            border: 1px solid #eee; display: none; /* 初期は非表示、ボタン押下で表示 */
+        }
 
         /* 下部リンク */
         .footer-links { text-align: center; padding: 20px 0; display: flex; flex-direction: column; gap: 10px; }
@@ -84,9 +83,7 @@
     </div>
 
     <div class="button-section">
-        <div class="btn-base-flat">
-            <button id="mainBtn"></button>
-        </div>
+        <div class="btn-base-flat"><button id="mainBtn"></button></div>
     </div>
 
     <div class="settings-card">
@@ -99,8 +96,12 @@
             <span>@</span>
             <input type="text" id="usernameInput" placeholder="ユーザーネーム">
         </div>
-        <textarea id="opinionInput" placeholder="ツールへのご意見（任意）"></textarea>
-        <button class="send-btn" id="sendBtn">Googleフォームへ送る</button>
+        
+        <button class="send-btn" id="toggleFormBtn">フォームを表示して報告する</button>
+    </div>
+
+    <div class="form-embed" id="formContainer">
+        <iframe src="https://docs.google.com/forms/d/e/【あなたのフォームID】/viewform?embedded=true" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe>
     </div>
 
     <div class="footer-links">
@@ -109,59 +110,48 @@
 </div>
 
 <script>
-    // --- 【管理用】認識済みのURLリスト ---
-    // 新しく見つけたらここに足して保存してください
-    const masterUrls = [
-        "https://example.com/id001",
-        "https://example.com/id002",
-        "https://example.com/id003"
-    ];
-
+    const masterUrls = ["https://example.com/1", "https://example.com/2"]; // ここにURLを入れる
     let pool = [...masterUrls];
     let stacked = [];
 
     const mainBtn = document.getElementById('mainBtn');
     const urlContainer = document.getElementById('urlContainer');
     const copyBtn = document.getElementById('copyBtn');
+    const toggleFormBtn = document.getElementById('toggleFormBtn');
+    const formContainer = document.getElementById('formContainer');
 
-    // 水晶玉を押してリンクを貯める
+    // リンクを貯める
     mainBtn.addEventListener('click', () => {
-        if (pool.length === 0) return alert("リストのURLをすべて貯めました");
+        if (pool.length === 0) return alert("全てスタック済みです");
         if(navigator.vibrate) navigator.vibrate(15);
-
         const idx = Math.floor(Math.random() * pool.length);
         const url = pool.splice(idx, 1)[0];
         stacked.push(url);
-
         const div = document.createElement('div');
-        div.className = 'url-line';
-        div.textContent = url;
+        div.className = 'url-line'; div.textContent = url;
         urlContainer.prepend(div);
     });
 
-    // Copyボタン（振動付き）
+    // コピー
     copyBtn.addEventListener('click', () => {
         if (stacked.length === 0) return;
         if(navigator.vibrate) navigator.vibrate(40);
-        
         const selectedApps = Array.from(document.querySelectorAll('.app-check:checked')).map(c => c.value);
         const user = document.getElementById('usernameInput').value;
-        const appPrefix = selectedApps.length > 0 ? `【${selectedApps.join('/')}】\n` : "";
-        const userPrefix = user ? `@${user}\n\n` : "";
-        const finalContent = appPrefix + userPrefix + stacked.join('\n');
-
+        const finalContent = `【${selectedApps.join('/')}】\n@${user}\n\n${stacked.join('\n')}`;
         navigator.clipboard.writeText(finalContent).then(() => {
             copyBtn.textContent = "Done!";
             setTimeout(() => copyBtn.textContent = "Copy", 1500);
         });
     });
 
-    // 送信ボタン（Googleフォームへ飛ばす）
-    document.getElementById('sendBtn').addEventListener('click', () => {
-        // あなたのGoogleフォームの編集用URLなど、管理画面へ飛ばすとチェックしやすいです
-        // もしくは回答用フォームのURLを入れてください
-        const formUrl = "https://docs.google.com/forms/d/e/あなたのフォームID/viewform"; 
-        window.open(formUrl, '_blank');
+    // ボタンを押すとフォームを表示する
+    toggleFormBtn.addEventListener('click', () => {
+        formContainer.style.display = "block";
+        toggleFormBtn.textContent = "↓ 下のフォームから送信してね";
+        toggleFormBtn.style.background = "#555";
+        // フォームまでスクロール
+        formContainer.scrollIntoView({ behavior: 'smooth' });
     });
 </script>
 
