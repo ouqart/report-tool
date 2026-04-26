@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Report Stack Pro</title>
+    <title>Report Stack</title>
     <style>
         :root {
             --bg: #10171e;
@@ -26,7 +26,7 @@
 
         .status {
             font-size: 1.1rem;
-            margin: 20px 0;
+            margin: 20px 0 40px 0;
             background: rgba(255,255,255,0.05);
             padding: 15px 30px;
             border-radius: 50px;
@@ -39,11 +39,11 @@
             margin: 0 10px;
         }
 
-        /* ★赤い丸でつやつやのボタン★ */
+        /* 赤い丸でつやつやのボタン */
         #addBtn {
             width: 160px;
             height: 160px;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: bold;
             color: white;
             border: none;
@@ -54,29 +54,28 @@
             box-shadow: 
                 15px 15px 40px #0a0e13,
                 -5px -5px 20px #1a2530,
-                inset 8px 8px 15px #ff3b81,
-                inset -8px -8px 15px #a81b47;
+                inset 10px 10px 15px #ff3b81,
+                inset -10px -10px 15px #a81b47;
             touch-action: manipulation;
             -webkit-user-select: none;
             user-select: none;
             transition: transform 0.05s;
-            margin-bottom: 10px;
         }
 
         #addBtn::after {
             content: '';
             position: absolute;
-            top: 10%;
+            top: 8%;
             left: 15%;
             width: 70%;
             height: 35%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0));
+            background: linear-gradient(to bottom, rgba(255,255,255,0.45), rgba(255,255,255,0));
             border-radius: 50%;
         }
 
         #addBtn:active {
             transform: scale(0.92) translateY(4px);
-            box-shadow: inset 10px 10px 20px #a81b47, inset -10px -10px 20px #ff3b81;
+            box-shadow: inset 12px 12px 20px #a81b47, inset -12px -12px 20px #ff3b81;
         }
 
         #addBtn:disabled { background: #536471; box-shadow: none; opacity: 0.5; }
@@ -91,7 +90,7 @@
             border-radius: 50px;
             font-weight: bold;
             font-size: 1.2rem;
-            margin-top: 20px;
+            margin-top: 50px;
         }
 
         .form-section { margin-top: auto; padding: 30px; width: 100%; border-top: 1px solid #38444d; }
@@ -103,8 +102,6 @@
     <div class="status">選択中: <span id="stackCount">0</span> / 50</div>
     
     <button id="addBtn">貯める</button>
-    <p style="color: #8899a6; font-size: 0.8rem;">長押しで加速！</p>
-
     <button id="finalCopyBtn" class="copy-btn">一括コピー</button>
 
     <div class="form-section">
@@ -114,13 +111,11 @@
 
     <script>
         const masterList = [
-            "https://x.com/sample1", "https://x.com/sample2", "https://x.com/sample3",
-            "https://x.com/sample4", "https://x.com/sample5"
+            "https://x.com/sample1", "https://x.com/sample2", "https://x.com/sample3"
         ];
 
         let selectedStack = [];
         let timer = null;
-        let currentSpeed = 300; 
         
         const btn = document.getElementById('addBtn');
         const countDisplay = document.getElementById('stackCount');
@@ -133,28 +128,17 @@
                 if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
                 return;
             }
-
             const randomUrl = masterList[Math.floor(Math.random() * masterList.length)];
             selectedStack.push(randomUrl);
             countDisplay.textContent = selectedStack.length;
-
-            // ★触感（バイブレーション）
             if(navigator.vibrate) navigator.vibrate(15); 
-
-            // ★加速
-            if (timer) {
-                clearInterval(timer);
-                currentSpeed = Math.max(40, currentSpeed * 0.82); 
-                timer = setInterval(addLink, currentSpeed);
-            }
         }
 
         function start(e) {
             e.preventDefault();
             if(btn.disabled) return;
-            currentSpeed = 300; 
             addLink(); 
-            timer = setInterval(addLink, currentSpeed);
+            timer = setInterval(addLink, 100); // 0.1秒間隔で連射
         }
 
         function stop() { clearInterval(timer); timer = null; }
