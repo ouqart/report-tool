@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Report Stack</title>
+    <style>
+        :root { --bg: #15202b; --card: #1e2732; --text: #ffffff; --accent: #1d9bf0; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 20px; text-align: center; }
+        .header { margin-bottom: 30px; }
+        #addBtn { width: 100%; height: 140px; font-size: 1.6rem; background: var(--accent); color: white; border: none; border-radius: 20px; font-weight: bold; touch-action: manipulation; -webkit-user-select: none; user-select: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        #addBtn:active { background: #1a8cd8; transform: scale(0.95); }
+        .status { font-size: 1.2rem; margin: 25px 0; background: #253341; padding: 15px; border-radius: 15px; }
+        #stackCount { font-size: 2.5rem; color: var(--accent); font-weight: bold; }
+        .copy-btn { width: 100%; padding: 18px; background: #fff; color: #000; border: none; border-radius: 50px; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
+        .form-section { margin-top: 60px; padding: 25px; border: 2px dashed #38444d; border-radius: 20px; background: rgba(29, 155, 240, 0.05); }
+        .form-link { display: inline-block; margin-top: 15px; padding: 12px 25px; background: var(--accent); color: white; text-decoration: none; border-radius: 25px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>通報支援スタック</h1>
+        <p>ボタンを連打、または長押しでURLを貯めます</p>
+    </div>
+
+    <div class="status">選択中: <span id="stackCount">0</span> / 50 件</div>
+    
+    <button id="addBtn">長押しで一気に貯める</button>
+    <p style="font-size: 0.8rem; color: #8899a6; margin-bottom: 20px;">※50件たまると自動で止まります</p>
+
+    <button id="finalCopyBtn" class="copy-btn">一括コピーして通報へ</button>
+
+    <div class="form-section">
+        <h3>通報候補を教える</h3>
+        <p>悪いユーザー名を管理者に報告します</p>
+        <a href="https://forms.google.com/..." class="form-link">報告フォームを開く ↗</a>
+    </div>
+
+    <script>
+        // 【管理者用】ここに通報してほしいURLのリストを並べてください
+        const masterList = [
+            "https://x.com/sample_user/status/1",
+            "https://x.com/sample_user/status/2",
+            "https://x.com/sample_user/status/3"
+        ];
+
+        let selectedStack = [];
+        let timer = null;
+
+        // リンクを1つランダムに追加する処理
+        function addLink() {
+            if (selectedStack.length >= 50) {
+                stop();
+                return;
+            }
+            // リストからランダムに選ぶ
+            const randomUrl = masterList[Math.floor(Math.random() * masterList.length)];
+            selectedStack.push(randomUrl);
+            document.getElementById('stackCount').textContent = selectedStack.length;
+        }
+
+        // 長押し・連打の開始
+        function start(e) {
+            e.preventDefault();
+            addLink(); // まず1発目
+            timer = setInterval(addLink, 100); // 0.1秒ごとに連射
+        }
+
+        // 指を離した時に停止
+        function stop() {
+            clearInterval(timer);
+        }
+
+        const btn = document.getElementById('addBtn');
+        // スマホ用
+        btn.addEventListener('touchstart', start);
+        btn.addEventListener('touchend', stop);
+        // パソコン用
+        btn.addEventListener('mousedown', start);
+        btn.addEventListener('mouseup', stop);
+
+        // 一括コピー
+        document.getElementById('finalCopyBtn').addEventListener('click', async () => {
+            if (selectedStack.length === 0) {
+                alert("まずは「長押し」でリンクを貯めてください！");
+                return;
+            }
+            const textToCopy = selectedStack.join('\n');
+            await navigator.clipboard.writeText(textToCopy);
+            alert(selectedStack.length + "件のURLをコピーしました！通報フォームへ貼り付けてください。");
+            
+            // コピーしたらリセット
+            selectedStack = [];
+            document.getElementById('stackCount').textContent = "0";
+        });
+    </script>
+</body>
+</html>
