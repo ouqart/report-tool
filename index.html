@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>URL Stack Master</title>
+    <title>LINK BUSTER</title>
     <style>
         :root { --bg: #ffffff; --text: #1a1a1a; }
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
+
+        h1 { font-size: 1.5rem; text-align: center; margin: 0; font-weight: 900; letter-spacing: 1px; }
 
         /* リンク表示エリア */
         .display-card {
@@ -22,8 +24,8 @@
             font-size: 0.7rem; cursor: pointer; color: #5f6368;
         }
 
-        /* 真上から見た水晶玉ボタン */
-        .button-section { display: flex; justify-content: center; padding: 20px 0; }
+        /* 水晶玉ボタン（真上からの視点） */
+        .button-section { display: flex; justify-content: center; padding: 15px 0; }
         .btn-base-flat {
             width: 180px; height: 180px;
             background: radial-gradient(circle, #444 0%, #111 80%, #000 100%);
@@ -44,32 +46,31 @@
         }
         #mainBtn:active { transform: scale(0.94); }
 
-        /* SNS設定エリア */
+        /* 設定エリア */
         .settings-card { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
         .checkbox-group { display: flex; gap: 5px; justify-content: space-between; margin-bottom: 15px; }
         .checkbox-group label { font-size: 0.85rem; display: flex; align-items: center; gap: 5px; font-weight: bold; }
         
-        .input-wrapper { position: relative; margin-bottom: 15px; }
+        .input-wrapper { position: relative; margin-bottom: 20px; }
         .input-wrapper span { position: absolute; left: 12px; top: 11px; font-weight: bold; color: #1a1a1a; }
         .input-wrapper input {
             width: 100%; padding: 12px 12px 12px 30px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 1rem;
         }
 
-        /* 超巨大・通報ボタン */
+        /* 巨大・通報ボタン */
         .send-btn { 
             width: 100%; padding: 20px; background: #e0245e; color: white; border: none; 
             border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.2rem; 
-            box-shadow: 0 6px 15px rgba(224, 36, 94, 0.4); transition: background 0.2s;
+            box-shadow: 0 6px 15px rgba(224, 36, 94, 0.4);
         }
         .send-btn:active { transform: scale(0.98); background: #b01d4a; }
 
-        /* Googleフォーム埋め込みエリア */
+        /* Googleフォーム埋め込み */
         .form-embed {
             width: 100%; margin-top: 20px; border-radius: 12px; overflow: hidden;
-            border: 1px solid #eee; display: none; /* 初期は非表示、ボタン押下で表示 */
+            border: 1px solid #eee; display: none;
         }
 
-        /* 下部リンク */
         .footer-links { text-align: center; padding: 20px 0; display: flex; flex-direction: column; gap: 10px; }
         .report-link { color: #bbb; font-size: 0.75rem; text-decoration: underline; }
     </style>
@@ -77,6 +78,8 @@
 <body>
 
 <div class="container">
+    <h1>LINK BUSTER</h1>
+
     <div class="display-card">
         <button class="copy-trigger" id="copyBtn">Copy</button>
         <div id="urlContainer"></div>
@@ -97,11 +100,11 @@
             <input type="text" id="usernameInput" placeholder="ユーザーネーム">
         </div>
         
-        <button class="send-btn" id="toggleFormBtn">フォームを表示して報告する</button>
+        <button class="send-btn" id="toggleFormBtn">REPORT FORM</button>
     </div>
 
     <div class="form-embed" id="formContainer">
-        <iframe src="https://docs.google.com/forms/d/e/【あなたのフォームID】/viewform?embedded=true" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe>
+        <iframe src="https://docs.google.com/forms/d/e/【あなたのフォームID】/viewform?embedded=true" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0"></iframe>
     </div>
 
     <div class="footer-links">
@@ -110,7 +113,7 @@
 </div>
 
 <script>
-    const masterUrls = ["https://example.com/1", "https://example.com/2"]; // ここにURLを入れる
+    const masterUrls = ["https://example.com/1", "https://example.com/2"]; 
     let pool = [...masterUrls];
     let stacked = [];
 
@@ -120,9 +123,8 @@
     const toggleFormBtn = document.getElementById('toggleFormBtn');
     const formContainer = document.getElementById('formContainer');
 
-    // リンクを貯める
     mainBtn.addEventListener('click', () => {
-        if (pool.length === 0) return alert("全てスタック済みです");
+        if (pool.length === 0) return;
         if(navigator.vibrate) navigator.vibrate(15);
         const idx = Math.floor(Math.random() * pool.length);
         const url = pool.splice(idx, 1)[0];
@@ -132,7 +134,6 @@
         urlContainer.prepend(div);
     });
 
-    // コピー
     copyBtn.addEventListener('click', () => {
         if (stacked.length === 0) return;
         if(navigator.vibrate) navigator.vibrate(40);
@@ -145,12 +146,10 @@
         });
     });
 
-    // ボタンを押すとフォームを表示する
     toggleFormBtn.addEventListener('click', () => {
         formContainer.style.display = "block";
-        toggleFormBtn.textContent = "↓ 下のフォームから送信してね";
+        toggleFormBtn.textContent = "FILL OUT THE FORM ↓";
         toggleFormBtn.style.background = "#555";
-        // フォームまでスクロール
         formContainer.scrollIntoView({ behavior: 'smooth' });
     });
 </script>
