@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Report Stack</title>
+    <title>Report Stack Pro</title>
     <style>
         :root {
-            --bg: #10171e; /* さらに濃いダークモード */
+            --bg: #10171e;
             --text: #ffffff;
-            --accent-red: #e0245e; /* X（Twitter）のいいねに近い赤 */
-            --accent-red-hover: #ffc4d6;
+            --accent-red: #e0245e;
         }
 
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, sans-serif;
             margin: 0;
             padding: 20px;
             text-align: center;
@@ -25,15 +24,6 @@
             min-height: 100vh;
         }
 
-        .header {
-            margin-bottom: 20px;
-            width: 100%;
-        }
-
-        h1 { font-size: 1.4rem; margin-bottom: 5px; }
-        .sub-text { font-size: 0.9rem; color: #8899a6; margin: 0; }
-
-        /* 選択件数の表示エリア */
         .status {
             font-size: 1.1rem;
             margin: 20px 0;
@@ -43,200 +33,145 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         #stackCount {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             color: var(--accent-red);
             font-weight: bold;
             margin: 0 10px;
-            font-variant-numeric: tabular-nums; /* 数字の幅を一定にしてガタつき防止 */
         }
 
         /* ★赤い丸でつやつやのボタン★ */
         #addBtn {
-            width: 150px; /* 丸くするために正方形に近づける */
-            height: 150px;
-            font-size: 1.4rem;
+            width: 160px;
+            height: 160px;
+            font-size: 1.5rem;
             font-weight: bold;
             color: white;
             border: none;
-            border-radius: 50%; /* 完璧な丸 */
+            border-radius: 50%;
             cursor: pointer;
             position: relative;
-            
-            /* つやつやのグラデーション */
             background: linear-gradient(145deg, #ff2a6f, #ca2055);
-            
-            /* 立体感のある影（3Dっぽさ） */
             box-shadow: 
-                20px 20px 60px #0e141a,    /* 外側の暗い影 */
-                -20px -20px 60px #121a22,   /* 外側の明るい影（浮き上がり効果） */
-                inset 10px 10px 20px #ff3b81, /* 内側のハイライト（つや） */
-                inset -10px -10px 20px #a81b47; /* 内側の影 */
-            
-            /* 連打・長押し時のズームなどを防止 */
+                15px 15px 40px #0a0e13,
+                -5px -5px 20px #1a2530,
+                inset 8px 8px 15px #ff3b81,
+                inset -8px -8px 15px #a81b47;
             touch-action: manipulation;
             -webkit-user-select: none;
             user-select: none;
-            -webkit-touch-callout: none;
-            
-            transition: all 0.1s ease; /* 押し込まれるアニメーション */
+            transition: transform 0.05s;
             margin-bottom: 10px;
         }
 
-        /* ボタンの上に疑似的な「光沢」を追加してさらにつやつやに */
         #addBtn::after {
             content: '';
             position: absolute;
             top: 10%;
             left: 15%;
             width: 70%;
-            height: 40%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0));
-            border-radius: 50% 50% 20% 20%;
+            height: 35%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0));
+            border-radius: 50%;
         }
 
-        /* 押し込まれた時の効果 */
         #addBtn:active {
-            box-shadow: 
-                inset 10px 10px 20px #a81b47, /* 影を反転させて凹ませる */
-                inset -10px -10px 20px #ff3b81;
-            transform: scale(0.96) translateY(4px); /* 少し小さく、下に移動 */
-        }
-        
-        /* 50件到達時のグレーアウト */
-        #addBtn:disabled {
-            background: #536471;
-            box-shadow: none;
-            opacity: 0.5;
-            cursor: not-allowed;
+            transform: scale(0.92) translateY(4px);
+            box-shadow: inset 10px 10px 20px #a81b47, inset -10px -10px 20px #ff3b81;
         }
 
-        .limit-text { font-size: 0.8rem; color: #8899a6; margin-bottom: 30px; }
+        #addBtn:disabled { background: #536471; box-shadow: none; opacity: 0.5; }
 
-        /* コピーボタン（赤枠のすっきりしたデザイン） */
         .copy-btn {
             width: 100%;
             max-width: 300px;
-            padding: 16px;
+            padding: 18px;
             background: none;
             color: var(--accent-red);
             border: 2px solid var(--accent-red);
             border-radius: 50px;
             font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .copy-btn:active {
-            background: rgba(224, 36, 94, 0.1);
-            transform: scale(0.98);
+            font-size: 1.2rem;
+            margin-top: 20px;
         }
 
-        /* 報告窓口セクション */
-        .form-section {
-            margin-top: auto; /* 画面の一番下に配置 */
-            padding: 20px;
-            width: 100%;
-            box-sizing: border-box;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 30px;
-        }
-        .form-section h3 { font-size: 1.1rem; margin-bottom: 5px; }
-        .form-link {
-            display: inline-block;
-            margin-top: 10px;
-            color: var(--accent-red);
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
+        .form-section { margin-top: auto; padding: 30px; width: 100%; border-top: 1px solid #38444d; }
+        .form-link { color: var(--accent-red); font-weight: bold; text-decoration: none; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>通報支援スタック</h1>
-        <p class="sub-text">赤いボタンを長押し・連打でURLを貯めます</p>
-    </div>
-
-    <div class="status">選択中: <span id="stackCount">0</span> / 50 件</div>
+    <h1>通報支援スタック</h1>
+    <div class="status">選択中: <span id="stackCount">0</span> / 50</div>
     
     <button id="addBtn">貯める</button>
-    <p class="limit-text">※50件たまると自動で止まります</p>
+    <p style="color: #8899a6; font-size: 0.8rem;">長押しで加速！</p>
 
-    <button id="finalCopyBtn" class="copy-btn">一括コピーして通報へ</button>
+    <button id="finalCopyBtn" class="copy-btn">一括コピー</button>
 
     <div class="form-section">
-        <h3>通報候補を教える</h3>
-        <p class="sub-text">悪いユーザー名を管理者に報告します</p>
-        <a href="https://forms.google.com/..." target="_blank" class="form-link">報告フォームを開く ↗</a>
+        <p>通報候補を教える</p>
+        <a href="https://forms.google.com/..." class="form-link">報告フォーム ↗</a>
     </div>
 
     <script>
-        // 【管理者用】ここに通報してほしいURLのリストを並べてください
         const masterList = [
-            "https://x.com/sample_user/status/1",
-            "https://x.com/sample_user/status/2",
-            "https://x.com/sample_user/status/3"
+            "https://x.com/sample1", "https://x.com/sample2", "https://x.com/sample3",
+            "https://x.com/sample4", "https://x.com/sample5"
         ];
 
         let selectedStack = [];
         let timer = null;
+        let currentSpeed = 300; 
+        
         const btn = document.getElementById('addBtn');
         const countDisplay = document.getElementById('stackCount');
 
-        // リンクを1つランダムに追加する処理
         function addLink() {
             if (selectedStack.length >= 50) {
                 stop();
-                btn.disabled = true; // ボタンを無効化
+                btn.disabled = true;
                 btn.textContent = "満タン";
+                if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
                 return;
             }
-            // リストからランダムに選ぶ
+
             const randomUrl = masterList[Math.floor(Math.random() * masterList.length)];
             selectedStack.push(randomUrl);
             countDisplay.textContent = selectedStack.length;
+
+            // ★触感（バイブレーション）
+            if(navigator.vibrate) navigator.vibrate(15); 
+
+            // ★加速
+            if (timer) {
+                clearInterval(timer);
+                currentSpeed = Math.max(40, currentSpeed * 0.82); 
+                timer = setInterval(addLink, currentSpeed);
+            }
         }
 
-        // 長押し・連打の開始
         function start(e) {
-            e.preventDefault(); // 余計な動作を防ぐ
+            e.preventDefault();
             if(btn.disabled) return;
-            addLink(); // まず1発目
-            timer = setInterval(addLink, 80); // 0.08秒ごとに連射（少し速くしました）
+            currentSpeed = 300; 
+            addLink(); 
+            timer = setInterval(addLink, currentSpeed);
         }
 
-        // 指を離した時に停止
-        function stop() {
-            clearInterval(timer);
-        }
+        function stop() { clearInterval(timer); timer = null; }
 
-        // スマホ用
         btn.addEventListener('touchstart', start);
         btn.addEventListener('touchend', stop);
         btn.addEventListener('touchcancel', stop);
-        // パソコン用
         btn.addEventListener('mousedown', start);
         btn.addEventListener('mouseup', stop);
-        btn.addEventListener('mouseleave', stop); // マウスがボタンから外れたら停止
 
-        // 一括コピー
         document.getElementById('finalCopyBtn').addEventListener('click', async () => {
-            if (selectedStack.length === 0) {
-                alert("まずは赤いボタンでリンクを貯めてください！");
-                return;
-            }
-            const textToCopy = selectedStack.join('\n');
-            await navigator.clipboard.writeText(textToCopy);
-            
-            // 触覚フィードバック（スマホが振動する、対応機種のみ）
-            if(navigator.vibrate) navigator.vibrate(100);
-
-            alert(selectedStack.length + "件のURLをコピーしました！通報フォームへ貼り付けてください。");
-            
-            // コピーしたらリセット
+            if (selectedStack.length === 0) return alert("貯めてください");
+            await navigator.clipboard.writeText(selectedStack.join('\n'));
+            alert(selectedStack.length + "件コピー完了！");
             selectedStack = [];
             countDisplay.textContent = "0";
-            btn.disabled = false; // ボタンを復活
+            btn.disabled = false;
             btn.textContent = "貯める";
         });
     </script>
