@@ -132,22 +132,27 @@
 </div>
 
 <script>
-    // ここにリンクを追加
-    const masterUrls = [
-        "https://x.com/pomnyannyan1/status/2048438747692425265?s=46",
-        "https://x.com/meromerobium/status/2048435674031002016?s=46",
-        "https://x.com/meromerobium/status/2048422548761956819?s=46",
-        "https://x.com/meromerobium/status/2048397380832387448?s=46",
-        "https://x.com/20002003kknn/status/2048393006970204172?s=46",
-        "https://x.com/20002003kknn/status/2044004152376996076?s=46",
-        "https://x.com/100ten_hnmr/status/2048380753244004365?s=46"
-    ]; 
-    let pool = [...masterUrls];
+    // 🔗 あなたのGASのURLをセット
+    const apiURL = 'https://script.google.com/macros/s/AKfycbwNMIqyjChPN5ckansj4zEcv-fEF9G6jnIOrdopZTCLOMMSRH5pZTEpS4U7-7-IJG2s/exec';
+
+    let pool = []; // ここにスプレッドシートから読み込んだURLが入ります
     let stacked = [];
 
     const mainBtn = document.getElementById('mainBtn');
     const urlContainer = document.getElementById('urlContainer');
     const copyBtn = document.getElementById('copyBtn');
+
+    // 🟢 スプレッドシートからデータを取得する関数
+    async function loadUrls() {
+        try {
+            const res = await fetch(`${apiURL}?action=getReports`);
+            const data = await res.json();
+            pool = [...data];
+            console.log("Loaded:", pool.length);
+        } catch (e) {
+            urlContainer.textContent = "読み込みエラー";
+        }
+    }
 
     // 押し心地の改良
     function pressStart() {
@@ -161,6 +166,8 @@
             const div = document.createElement('div');
             div.className = 'url-line'; div.textContent = url;
             urlContainer.prepend(div);
+        } else if (stacked.length === 0) {
+            urlContainer.textContent = "リストが空、または読み込み中です";
         }
     }
 
@@ -185,6 +192,9 @@
     function toggleAccordion(element) {
         element.parentElement.classList.toggle('active');
     }
+
+    // 起動時にデータを読み込む
+    loadUrls();
 </script>
 
 </body>
