@@ -19,16 +19,10 @@
             display: flex; flex-direction: column;
         }
 
-        /* タイトルエリア */
-        .title-area {
-            height: 60px; display: flex; align-items: center; justify-content: center;
-        }
+        .title-area { height: 60px; display: flex; align-items: center; justify-content: center; }
         h1 { font-size: 1.8rem; text-align: center; margin: 0; font-weight: 900; letter-spacing: 1px; }
 
-        /* ボタンの位置を完全に固定 */
-        .button-section { 
-            height: 200px; display: flex; justify-content: center; align-items: center;
-        }
+        .button-section { height: 200px; display: flex; justify-content: center; align-items: center; }
         .btn-base-flat {
             width: 170px; height: 170px;
             background: radial-gradient(circle, #444 0%, #111 80%, #000 100%);
@@ -49,26 +43,25 @@
             filter: blur(3px); border-radius: 50%;
         }
 
-        /* 触れた瞬間の凹み */
         .is-pressed { 
             transform: scale(0.92) translateY(3px) !important;
             box-shadow: inset 0 12px 18px rgba(0,0,0,0.8) !important;
         }
 
-        /* リンク表示エリア（高さを固定してガタつき防止） */
         .display-card {
             background: #f8f9fa; border-radius: 12px; padding: 15px;
             height: 100px; overflow-y: auto;
             position: relative; border: 1px solid #eee; margin-bottom: 20px;
         }
         .url-line { font-size: 0.8rem; color: #1a73e8; margin-bottom: 2px; word-break: break-all;}
-        .copy-trigger { 
-            position: absolute; top: 8px; right: 8px; background: #fff; 
-            border: 1px solid #ddd; padding: 4px 12px; border-radius: 6px; 
-            font-size: 0.75rem; cursor: pointer; color: #5f6368; font-weight: bold; z-index: 10;
+        
+        /* 操作ボタンエリア */
+        .controls { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; z-index: 10; }
+        .control-btn { 
+            background: #fff; border: 1px solid #ddd; padding: 4px 10px; border-radius: 6px; 
+            font-size: 0.75rem; cursor: pointer; color: #5f6368; font-weight: bold;
         }
 
-        /* 通報フォームボタン（文字変更） */
         .office-report-btn { 
             width: 100%; padding: 20px; background: #000; color: #fff; border: none; 
             border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 1.3rem; 
@@ -76,7 +69,6 @@
             margin-bottom: 20px;
         }
 
-        /* バナー（アコーディオン） */
         .accordion-item { border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 10px; }
         .accordion-header { 
             width: 100%; padding: 15px; background: #fff; border: none; 
@@ -102,7 +94,10 @@
     </div>
 
     <div class="display-card">
-        <button class="copy-trigger" id="copyBtn">Copy</button>
+        <div class="controls">
+            <button class="control-btn" id="clearBtn">Clear</button>
+            <button class="control-btn" id="copyBtn">Copy</button>
+        </div>
         <div id="urlContainer"></div>
     </div>
 
@@ -132,17 +127,16 @@
 </div>
 
 <script>
-    // 🔗 あなたのGASのURLをセット
     const apiURL = 'https://script.google.com/macros/s/AKfycbwNMIqyjChPN5ckansj4zEcv-fEF9G6jnIOrdopZTCLOMMSRH5pZTEpS4U7-7-IJG2s/exec';
 
-    let pool = []; // ここにスプレッドシートから読み込んだURLが入ります
+    let pool = []; 
     let stacked = [];
 
     const mainBtn = document.getElementById('mainBtn');
     const urlContainer = document.getElementById('urlContainer');
     const copyBtn = document.getElementById('copyBtn');
+    const clearBtn = document.getElementById('clearBtn');
 
-    // 🟢 スプレッドシートからデータを取得する関数
     async function loadUrls() {
         try {
             const res = await fetch(`${apiURL}?action=getReports`);
@@ -154,12 +148,14 @@
         }
     }
 
-    // 押し心地の改良
     function pressStart() {
         mainBtn.classList.add('is-pressed');
         if(navigator.vibrate) navigator.vibrate(12);
         
         if (pool.length > 0) {
+            // クリア直後などの文言を消す
+            if (stacked.length === 0) urlContainer.textContent = "";
+
             const idx = Math.floor(Math.random() * pool.length);
             const url = pool.splice(idx, 1)[0];
             stacked.push(url);
@@ -167,13 +163,21 @@
             div.className = 'url-line'; div.textContent = url;
             urlContainer.prepend(div);
         } else if (stacked.length === 0) {
-            urlContainer.textContent = "リストが空、または読み込み中です";
+            urlContainer.textContent = "新しいリンクはありません。";
         }
     }
 
     function pressEnd() {
         mainBtn.classList.remove('is-pressed');
     }
+
+    // 🟢 クリアボタンの処理（リロードせず画面だけ掃除）
+    clearBtn.addEventListener('click', () => {
+        stacked = []; // 記憶を空にする
+        urlContainer.textContent = ""; // 画面を空にする
+        clearBtn.textContent = "Reset!";
+        setTimeout(() => clearBtn.textContent = "Clear", 800);
+    });
 
     mainBtn.addEventListener('touchstart', (e) => { e.preventDefault(); pressStart(); });
     mainBtn.addEventListener('touchend', pressEnd);
@@ -193,7 +197,6 @@
         element.parentElement.classList.toggle('active');
     }
 
-    // 起動時にデータを読み込む
     loadUrls();
 </script>
 
