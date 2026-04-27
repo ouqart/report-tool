@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>タイトル未定</title>
+    <title>REPORT SUPPORT</title>
     <style>
         :root { --bg: #ffffff; --text: #1a1a1a; }
         body { 
@@ -16,18 +16,18 @@
         
         .container { 
             width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; 
-            display: flex; flex-direction: column; 
+            display: flex; flex-direction: column;
         }
 
-        /* タイトルエリア（仮） */
+        /* タイトルエリア */
         .title-area {
-            height: 50px; display: flex; align-items: center; justify-content: center;
+            height: 60px; display: flex; align-items: center; justify-content: center;
         }
-        h1 { font-size: 1.8rem; text-align: center; margin: 0; font-weight: 900; }
+        h1 { font-size: 1.8rem; text-align: center; margin: 0; font-weight: 900; letter-spacing: 1px; }
 
         /* ボタンの位置を完全に固定 */
         .button-section { 
-            height: 210px; display: flex; justify-content: center; align-items: center;
+            height: 200px; display: flex; justify-content: center; align-items: center;
         }
         .btn-base-flat {
             width: 170px; height: 170px;
@@ -49,7 +49,7 @@
             filter: blur(3px); border-radius: 50%;
         }
 
-        /* みんはや風の凹み */
+        /* 触れた瞬間の凹み */
         .is-pressed { 
             transform: scale(0.92) translateY(3px) !important;
             box-shadow: inset 0 12px 18px rgba(0,0,0,0.8) !important;
@@ -68,7 +68,7 @@
             font-size: 0.75rem; cursor: pointer; color: #5f6368; font-weight: bold; z-index: 10;
         }
 
-        /* 通報フォームボタン（黒） */
+        /* 通報フォームボタン（文字変更） */
         .office-report-btn { 
             width: 100%; padding: 20px; background: #000; color: #fff; border: none; 
             border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 1.3rem; 
@@ -76,7 +76,7 @@
             margin-bottom: 20px;
         }
 
-        /* フォームバナー（アコーディオン） */
+        /* バナー（アコーディオン） */
         .accordion-item { border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 10px; }
         .accordion-header { 
             width: 100%; padding: 15px; background: #fff; border: none; 
@@ -94,7 +94,7 @@
 
 <div class="container">
     <div class="title-area">
-        <h1 id="appTitle">ランダムリンク</h1>
+        <h1>REPORT SUPPORT</h1>
     </div>
 
     <div class="button-section">
@@ -132,6 +132,7 @@
 </div>
 
 <script>
+    // ここにリンクを追加
     const masterUrls = [
         "https://x.com/violation_user_01/status/1",
         "https://x.com/violation_user_02/status/2",
@@ -148,9 +149,8 @@
     const urlContainer = document.getElementById('urlContainer');
     const copyBtn = document.getElementById('copyBtn');
 
-    // 触れた瞬間の反応
-    function pressStart(e) {
-        // e.preventDefault(); // これを外すとクリックも効くようになります
+    // 押し心地の改良
+    function pressStart() {
         mainBtn.classList.add('is-pressed');
         if(navigator.vibrate) navigator.vibrate(12);
         
@@ -168,7 +168,6 @@
         mainBtn.classList.remove('is-pressed');
     }
 
-    // イベント登録
     mainBtn.addEventListener('touchstart', (e) => { e.preventDefault(); pressStart(); });
     mainBtn.addEventListener('touchend', pressEnd);
     mainBtn.addEventListener('mousedown', pressStart);
@@ -183,10 +182,8 @@
         });
     });
 
-    // 動きを最小限にするための開閉処理
     function toggleAccordion(element) {
-        const item = element.parentElement;
-        item.classList.toggle('active');
+        element.parentElement.classList.toggle('active');
     }
 </script>
 
