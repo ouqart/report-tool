@@ -48,6 +48,7 @@
             box-shadow: inset 0 12px 18px rgba(0,0,0,0.8) !important;
         }
 
+        /* リンク表示エリア：外枠にposition:relativeを維持 */
         .display-card {
             background: #f8f9fa; border-radius: 12px; padding: 15px;
             height: 100px; overflow-y: auto;
@@ -55,11 +56,19 @@
         }
         .url-line { font-size: 0.8rem; color: #1a73e8; margin-bottom: 2px; word-break: break-all;}
         
-        /* 操作ボタンエリア */
-        .controls { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; z-index: 10; }
+        /* 💡 操作ボタン：position: sticky に変更してスクロールしても固定 */
+        .controls { 
+            position: sticky; 
+            top: -5px; /* 親のパディング分少し調整 */
+            float: right; /* 右に寄せる */
+            display: flex; gap: 5px; z-index: 100;
+            background: rgba(248, 249, 250, 0.9); /* 背景と同化させて後ろの文字を隠す */
+            padding: 2px; border-radius: 4px;
+        }
         .control-btn { 
             background: #fff; border: 1px solid #ddd; padding: 4px 10px; border-radius: 6px; 
             font-size: 0.75rem; cursor: pointer; color: #5f6368; font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .office-report-btn { 
@@ -69,6 +78,7 @@
             margin-bottom: 20px;
         }
 
+        /* アコーディオン等の下部デザインは変更なし */
         .accordion-item { border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 10px; }
         .accordion-header { 
             width: 100%; padding: 15px; background: #fff; border: none; 
@@ -98,27 +108,21 @@
             <button class="control-btn" id="clearBtn">Clear</button>
             <button class="control-btn" id="copyBtn">Copy</button>
         </div>
+        <div id="statusMsg" style="font-size: 0.85rem; color: #666; margin-bottom: 5px;"></div>
         <div id="urlContainer"></div>
     </div>
 
-    <a href="https://starto.jp/s/p/form/question?cd=violation" target="_blank" class="office-report-btn">
-        通報フォーム
-    </a>
+    <a href="https://starto.jp/s/p/form/question?cd=violation" target="_blank" class="office-report-btn">通報フォーム</a>
 
     <div class="form-area">
         <div class="accordion-item">
-            <button class="accordion-header" onclick="toggleAccordion(this)">
-                ⚠️ 情報提供はこちら <span class="arrow"></span>
-            </button>
+            <button class="accordion-header" onclick="toggleAccordion(this)">⚠️ 情報提供はこちら <span class="arrow"></span></button>
             <div class="accordion-content">
                 <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdgeB3B-xQJ5tw1xrZHzlxQKDqoX7CQF4BqMpkotaX0UPfUrw/viewform?embedded=true" width="100%" height="450" frameborder="0"></iframe>
             </div>
         </div>
-
         <div class="accordion-item">
-            <button class="accordion-header" onclick="toggleAccordion(this)">
-                ✉️ ご意見・ご要望 <span class="arrow"></span>
-            </button>
+            <button class="accordion-header" onclick="toggleAccordion(this)">✉️ ご意見・ご要望 <span class="arrow"></span></button>
             <div class="accordion-content">
                 <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe3dHNLs7cyLtGcsCyR7hPRHLwSiNWl0x7YfCsQdZI6LQgaXA/viewform?embedded=true" width="100%" height="450" frameborder="0"></iframe>
             </div>
@@ -134,17 +138,19 @@
 
     const mainBtn = document.getElementById('mainBtn');
     const urlContainer = document.getElementById('urlContainer');
+    const statusMsg = document.getElementById('statusMsg');
     const copyBtn = document.getElementById('copyBtn');
     const clearBtn = document.getElementById('clearBtn');
 
     async function loadUrls() {
         try {
+            statusMsg.textContent = "読み込み中...";
             const res = await fetch(`${apiURL}?action=getReports`);
             const data = await res.json();
             pool = [...data];
-            console.log("Loaded:", pool.length);
+            statusMsg.textContent = pool.length > 0 ? "ボタンを押してリンクを取得" : "新しいリンクはありません。";
         } catch (e) {
-            urlContainer.textContent = "読み込みエラー";
+            statusMsg.textContent = "読み込みエラー";
         }
     }
 
@@ -153,28 +159,35 @@
         if(navigator.vibrate) navigator.vibrate(12);
         
         if (pool.length > 0) {
-            // クリア直後などの文言を消す
-            if (stacked.length === 0) urlContainer.textContent = "";
-
             const idx = Math.floor(Math.random() * pool.length);
             const url = pool.splice(idx, 1)[0];
             stacked.push(url);
+            
+            statusMsg.textContent = ""; // リンクが出たらメッセージは消す
+            
             const div = document.createElement('div');
-            div.className = 'url-line'; div.textContent = url;
+            div.className = 'url-line'; 
+            div.textContent = url;
             urlContainer.prepend(div);
-        } else if (stacked.length === 0) {
-            urlContainer.textContent = "新しいリンクはありません。";
+        } else {
+            statusMsg.textContent = "新しいリンクはありません。";
         }
     }
 
-    function pressEnd() {
-        mainBtn.classList.remove('is-pressed');
-    }
+    function pressEnd() { mainBtn.classList.remove('is-pressed'); }
 
-    // 🟢 クリアボタンの処理（リロードせず画面だけ掃除）
+    // 🟢 修正：出したリンクボックスの中身だけを消す
     clearBtn.addEventListener('click', () => {
-        stacked = []; // 記憶を空にする
-        urlContainer.textContent = ""; // 画面を空にする
+        stacked = []; 
+        urlContainer.innerHTML = ""; // 出したリンク（HTML）を空にする
+        
+        // 💡 「新しいリンクはありません」という状態ならメッセージは残す
+        if (pool.length === 0) {
+            statusMsg.textContent = "新しいリンクはありません。";
+        } else {
+            statusMsg.textContent = "ボタンを押してリンクを取得";
+        }
+        
         clearBtn.textContent = "Reset!";
         setTimeout(() => clearBtn.textContent = "Clear", 800);
     });
