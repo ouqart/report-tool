@@ -5,7 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>REPORT SUPPORT</title>
     <style>
-        :root { --bg: #ffffff; --text: #1a1a1a; }
+        :root { 
+            --bg: #fff5f5;          /* ごく薄い赤（全体背景） */
+            --text: #4a0e0e;        /* 濃い赤茶（文字） */
+            --card-bg: #ffe3e3;     /* 薄い赤（ボックス背景） */
+            --accent-red: #ff4d4d;  /* メインの鮮やかな赤 */
+            --border-red: #ffccd5;  /* 境界線用の薄いピンク */
+            --white: #ffffff;
+        }
+        
         body { 
             background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; 
             margin: 0; display: flex; flex-direction: column; align-items: center; 
@@ -20,15 +28,21 @@
         }
 
         .title-area { height: 60px; display: flex; align-items: center; justify-content: center; }
-        h1 { font-size: 1.8rem; text-align: center; margin: 0; font-weight: 900; letter-spacing: 1px; }
+        h1 { 
+            font-size: 1.8rem; text-align: center; margin: 0; font-weight: 900; 
+            letter-spacing: 1px; color: var(--accent-red);
+        }
 
         .button-section { height: 200px; display: flex; justify-content: center; align-items: center; }
+        
+        /* ボタン土台をグレーから赤系グラデーションへ */
         .btn-base-flat {
             width: 170px; height: 170px;
-            background: radial-gradient(circle, #444 0%, #111 80%, #000 100%);
+            background: radial-gradient(circle, #ffccd5 0%, #ff8fa3 80%, #ff4d6d 100%);
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 20px rgba(255, 77, 77, 0.2);
         }
+        
         #mainBtn {
             width: 135px; height: 135px; border: none; border-radius: 50%;
             background: radial-gradient(circle at 50% 30%, #ffc0d4 0%, #ff0044 50%, #5e0018 100%);
@@ -48,48 +62,51 @@
             box-shadow: inset 0 12px 18px rgba(0,0,0,0.8) !important;
         }
 
-        /* リンク表示エリア：外枠にposition:relativeを維持 */
         .display-card {
-            background: #f8f9fa; border-radius: 12px; padding: 15px;
+            background: var(--card-bg); border-radius: 12px; padding: 15px;
             height: 100px; overflow-y: auto;
-            position: relative; border: 1px solid #eee; margin-bottom: 20px;
+            position: relative; border: 1px solid var(--border-red); margin-bottom: 20px;
         }
-        .url-line { font-size: 0.8rem; color: #1a73e8; margin-bottom: 2px; word-break: break-all;}
         
-        /* 💡 操作ボタン：position: sticky に変更してスクロールしても固定 */
+        /* URLの色を青から赤系へ */
+        .url-line { font-size: 0.8rem; color: #d63031; margin-bottom: 2px; word-break: break-all; font-weight: 500;}
+        
         .controls { 
-            position: sticky; 
-            top: -5px; /* 親のパディング分少し調整 */
-            float: right; /* 右に寄せる */
-            display: flex; gap: 5px; z-index: 100;
-            background: rgba(248, 249, 250, 0.9); /* 背景と同化させて後ろの文字を隠す */
+            position: sticky; top: -5px; float: right; display: flex; gap: 5px; z-index: 100;
+            background: rgba(255, 227, 227, 0.9); /* カード背景に合わせた半透明 */
             padding: 2px; border-radius: 4px;
         }
+        
         .control-btn { 
-            background: #fff; border: 1px solid #ddd; padding: 4px 10px; border-radius: 6px; 
-            font-size: 0.75rem; cursor: pointer; color: #5f6368; font-weight: bold;
+            background: var(--white); border: 1px solid var(--border-red); padding: 4px 10px; border-radius: 6px; 
+            font-size: 0.75rem; cursor: pointer; color: var(--accent-red); font-weight: bold;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .office-report-btn { 
-            width: 100%; padding: 20px; background: #000; color: #fff; border: none; 
+            width: 100%; padding: 20px; background: var(--accent-red); color: var(--white); border: none; 
             border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 1.3rem; 
             text-decoration: none; text-align: center; display: block; box-sizing: border-box;
             margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(255, 77, 77, 0.3);
         }
 
-        /* アコーディオン等の下部デザインは変更なし */
-        .accordion-item { border: 1px solid #eee; border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 10px; }
+        .accordion-item { border: 1px solid var(--border-red); border-radius: 12px; overflow: hidden; background: var(--white); margin-bottom: 10px; }
         .accordion-header { 
-            width: 100%; padding: 15px; background: #fff; border: none; 
+            width: 100%; padding: 15px; background: var(--white); border: none; 
             display: flex; justify-content: space-between; align-items: center; 
-            font-weight: bold; cursor: pointer; font-size: 0.95rem;
+            font-weight: bold; cursor: pointer; font-size: 0.95rem; color: var(--text);
         }
-        .arrow { width: 8px; height: 8px; border-right: 2px solid #999; border-bottom: 2px solid #999; transform: rotate(45deg); transition: transform 0.3s; margin-right: 5px; }
+        
+        .arrow { 
+            width: 8px; height: 8px; 
+            border-right: 2px solid var(--accent-red); 
+            border-bottom: 2px solid var(--accent-red); 
+            transform: rotate(45deg); transition: transform 0.3s; margin-right: 5px; 
+        }
         .accordion-item.active .arrow { transform: rotate(-135deg); }
-        .accordion-content { display: none; border-top: 1px solid #eee; background: #fcfcfc; }
+        .accordion-content { display: none; border-top: 1px solid var(--border-red); background: var(--white); }
         .accordion-item.active .accordion-content { display: block; }
-
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -108,11 +125,13 @@
             <button class="control-btn" id="clearBtn">Clear</button>
             <button class="control-btn" id="copyBtn">Copy</button>
         </div>
-        <div id="statusMsg" style="font-size: 0.85rem; color: #666; margin-bottom: 5px;"></div>
+        <div id="statusMsg" style="font-size: 0.85rem; color: var(--text); opacity: 0.7; margin-bottom: 5px;"></div>
         <div id="urlContainer"></div>
     </div>
 
-    <a href="https://starto.jp/s/p/form/question?cd=violation" target="_blank" class="office-report-btn">通報フォーム</a>
+    <a href="https://starto.jp/s/p/form/question?cd=violation" target="_blank" class="office-report-btn">
+        通報フォーム
+    </a>
 
     <div class="form-area">
         <div class="accordion-item">
@@ -162,9 +181,7 @@
             const idx = Math.floor(Math.random() * pool.length);
             const url = pool.splice(idx, 1)[0];
             stacked.push(url);
-            
-            statusMsg.textContent = ""; // リンクが出たらメッセージは消す
-            
+            statusMsg.textContent = ""; 
             const div = document.createElement('div');
             div.className = 'url-line'; 
             div.textContent = url;
@@ -176,18 +193,14 @@
 
     function pressEnd() { mainBtn.classList.remove('is-pressed'); }
 
-    // 🟢 修正：出したリンクボックスの中身だけを消す
     clearBtn.addEventListener('click', () => {
         stacked = []; 
-        urlContainer.innerHTML = ""; // 出したリンク（HTML）を空にする
-        
-        // 💡 「新しいリンクはありません」という状態ならメッセージは残す
+        urlContainer.innerHTML = ""; 
         if (pool.length === 0) {
             statusMsg.textContent = "新しいリンクはありません。";
         } else {
             statusMsg.textContent = "ボタンを押してリンクを取得";
         }
-        
         clearBtn.textContent = "Reset!";
         setTimeout(() => clearBtn.textContent = "Clear", 800);
     });
@@ -212,6 +225,5 @@
 
     loadUrls();
 </script>
-
 </body>
 </html>
